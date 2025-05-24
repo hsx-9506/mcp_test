@@ -5,26 +5,33 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-<pre>
- 📦 AI 製程分析 MCP
- │
- ├─ README.md                  # 專案說明
- ├─ requirements.txt           # Python依賴
- │
- ├─ data/                      # 原始Excel
- │   └─ 20250430產品出貨SPC/
- │
- ├─ mcp_server/                # API 伺服器
- │   ├─ batch_anomaly_server.py
- │   ├─ spc_summary_server.py
- │   └─ json_cache/
- │
- ├─ core/                      # 共用模組
- │   ├─ etl_utils.py
- │   └─ spc_utils.py
- │
- └─ .vscode/                   # 開發環境設定
-     └─ settings.json
+<pre> MCP_TEST 
+│ 
+├─ README.md # 專案說明 
+├─ requirements.txt         # Python依賴 
+├─ run_guide.md             # 操作手冊/快速指南 
+│ 
+├─ .vscode/                 # VSCode 開發設定 
+│ ├─ launch.json 
+│ └─ settings.json 
+│ 
+├─ 20250430產品出貨SPC/　　　# 原始Excel資料 
+│ 
+├─ agent_client/            # LLM Agent 端 
+│ └─ llm_agent.py 
+│  
+├─ config/                  # 設定/共用設定模組 
+│ └─ setting.py 
+│ ├─ edge_etl/              # 邊緣端ETL/前處理 
+│ └─ etl_to_json.py 
+│ 
+├─ mcp_server/              # MCP伺服器API與快取 
+│ 
+├─ batch_anomaly_server.py 
+│ 
+├─ spc_summary_server.py 
+│ └─ json_cache/ 
+│ └─ .gitignore             # Git忽略規則 
 </pre>
 
 ## 功能流程
