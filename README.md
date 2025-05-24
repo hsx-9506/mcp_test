@@ -5,7 +5,27 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-<pre> 📦 AI 製程分析 MCP │ ├── 📑 <b>README.md</b> ── 專案說明與快速啟動 ├── 📄 <b>requirements.txt</b> ── Python 依賴 │ ├── 📦 <b>data/</b> ── 原始 Excel 資料 │ └── 20250430產品出貨SPC/ │ ├── 🖥️ <b>mcp_server/</b> ── API伺服器、工具 │ ├── batch_anomaly_server.py │ ├── spc_summary_server.py │ ├── llm_agent.py │ ├── settings.py │ └── json_cache/ │ └── *.json │ ├── 🧩 <b>core/</b> ── ETL/資料處理/通用模組 │ ├── etl_utils.py │ └── spc_utils.py │ ├── 🛠️ <b>scripts/</b> ── 批次測試、自動化腳本 │ └── test_api.py │ └── .vscode/ └── settings.json </pre>
+<pre>
+ 📦 AI 製程分析 MCP
+ │
+ ├─ README.md                  # 專案說明
+ ├─ requirements.txt           # Python依賴
+ │
+ ├─ data/                      # 原始Excel
+ │   └─ 20250430產品出貨SPC/
+ │
+ ├─ mcp_server/                # API 伺服器
+ │   ├─ batch_anomaly_server.py
+ │   ├─ spc_summary_server.py
+ │   └─ json_cache/
+ │
+ ├─ core/                      # 共用模組
+ │   ├─ etl_utils.py
+ │   └─ spc_utils.py
+ │
+ └─ .vscode/                   # 開發環境設定
+     └─ settings.json
+</pre>
 
 ## 功能流程
 
@@ -27,30 +47,30 @@
     pip install -r requirements.txt
     ```
 
-2. **準備 OpenAI API 金鑰**
+2. **準備 LLM API 金鑰**
 
-    - 設定環境變數：
+    - Windows cmd 設定環境變數：
       ```bash
-      export OPENAI_API_KEY=sk-xxxxxx  # Linux/Mac
-      ```
-      或在 Windows cmd：
-      ```cmd
       set OPENAI_API_KEY=sk-xxxxxx
+      ```
+      或是直接在 settings.json 修改:
+      ```bash
+      "OPENAI_API_KEY"=sk-xxxxxx
       ```
 
     - 或以 `settings.json` 搭配 `settings.py` 讀取。
 
 3. **資料前處理**
     ```bash
-    python etl_to_json.py --all
+    python edge_etl/etl_to_json.py 
     # 或
-    python etl_to_json.py --batch <批次關鍵字>
+    python edge_etl/etl_to_json.py --batch <批次關鍵字>
     ```
 
 4. **啟動 MCP-server 子服務**
     ```bash
-    uvicorn batch_anomaly_server:app --host 0.0.0.0 --port 8001
-    uvicorn spc_summary_server:app   --host 0.0.0.0 --port 8002
+    uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
+    uvicorn mcp_server.spc_summary_server:app   --host 0.0.0.0 --port 8002
     ```
 
 5. **執行 LLM 多工具整合問答**
