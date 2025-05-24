@@ -5,7 +5,7 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-<pre> <code> 📦 <b>專案名稱（Project Name）</b> ├── <b>README.md</b> ├── <b>requirements.txt</b> ├── <b>.vscode/</b> │ └── settings.json ├── <b>data/</b> │ └── 20250430產品出貨SPC/ ├── <b>mcp_server/</b> │ ├── batch_anomaly_server.py │ ├── spc_summary_server.py │ ├── llm_agent.py │ ├── settings.py │ └── json_cache/ │ └── *.json ├── <b>core/</b> │ ├── etl_utils.py │ └── spc_utils.py ├── <b>scripts/</b> │ └── test_api.py └── <b>.gitignore</b> </code> </pre>
+<pre> 📦 AI 製程分析 MCP │ ├── 📑 <b>README.md</b> ── 專案說明與快速啟動 ├── 📄 <b>requirements.txt</b> ── Python 依賴 │ ├── 📦 <b>data/</b> ── 原始 Excel 資料 │ └── 20250430產品出貨SPC/ │ ├── 🖥️ <b>mcp_server/</b> ── API伺服器、工具 │ ├── batch_anomaly_server.py │ ├── spc_summary_server.py │ ├── llm_agent.py │ ├── settings.py │ └── json_cache/ │ └── *.json │ ├── 🧩 <b>core/</b> ── ETL/資料處理/通用模組 │ ├── etl_utils.py │ └── spc_utils.py │ ├── 🛠️ <b>scripts/</b> ── 批次測試、自動化腳本 │ └── test_api.py │ └── .vscode/ └── settings.json </pre>
 
 ## 功能流程
 
