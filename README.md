@@ -29,7 +29,7 @@
 │   ├─ batch_anomaly_server.py 
 │   ├─ spc_summary_server.py 
 │   └─ json_cache/ 
-├─ .gitignore                   # Git忽略規則 
+└─ .gitignore                   # Git忽略規則 
 </pre>
 
 ## 功能流程
@@ -53,10 +53,13 @@
     ```
 
 2. **準備 LLM API 金鑰**
-
     - Windows cmd 設定環境變數：
       ```bash
       set OPENAI_API_KEY=sk-xxxxxx
+      ```
+      或是直接在 settings.json 修改:
+      ```bash
+      "OPENAI_API_KEY"=sk-xxxxxx
       ```
       或是直接在 settings.json 修改:
       ```bash
