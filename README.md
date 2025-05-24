@@ -53,10 +53,16 @@
     ```
 
 2. **準備 LLM API 金鑰**
+2. **準備 LLM API 金鑰**
 
+    - Windows cmd 設定環境變數：
     - Windows cmd 設定環境變數：
       ```bash
       set OPENAI_API_KEY=sk-xxxxxx
+      ```
+      或是直接在 settings.json 修改:
+      ```bash
+      "OPENAI_API_KEY"=sk-xxxxxx
       ```
       或是直接在 settings.json 修改:
       ```bash
@@ -68,12 +74,16 @@
 3. **資料前處理**
     ```bash
     python edge_etl/etl_to_json.py 
+    python edge_etl/etl_to_json.py 
     # 或
+    python edge_etl/etl_to_json.py --batch <批次關鍵字>
     python edge_etl/etl_to_json.py --batch <批次關鍵字>
     ```
 
 4. **啟動 MCP-server 子服務**
     ```bash
+    uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
+    uvicorn mcp_server.spc_summary_server:app   --host 0.0.0.0 --port 8002
     uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
     uvicorn mcp_server.spc_summary_server:app   --host 0.0.0.0 --port 8002
     ```
