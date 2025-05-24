@@ -53,13 +53,11 @@
     ```
 
 2. **準備 LLM API 金鑰**
+
+    - Windows cmd 設定環境變數：
     - Windows cmd 設定環境變數：
       ```bash
       set OPENAI_API_KEY=sk-xxxxxx
-      ```
-      或是直接在 settings.json 修改:
-      ```bash
-      "OPENAI_API_KEY"=sk-xxxxxx
       ```
       或是直接在 settings.json 修改:
       ```bash
