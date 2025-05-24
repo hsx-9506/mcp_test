@@ -8,30 +8,28 @@
 <pre> MCP_TEST 
 │ 
 ├─ README.md # 專案說明 
-├─ requirements.txt         # Python依賴 
-├─ run_guide.md             # 操作手冊/快速指南 
+├─ requirements.txt             # Python依賴 
+├─ run_guide.md                 # 操作手冊/快速指南 
+├─ 20250430產品出貨SPC/　　　   # 原始Excel資料 
 │ 
-├─ .vscode/                 # VSCode 開發設定 
-│ ├─ launch.json 
-│ └─ settings.json 
+├─ .vscode/                     # VSCode 開發設定 
+│   ├─ launch.json 
+│   └─ settings.json 
 │ 
-├─ 20250430產品出貨SPC/　　　# 原始Excel資料 
-│ 
-├─ agent_client/            # LLM Agent 端 
-│ └─ llm_agent.py 
+├─ agent_client/                # LLM Agent 端 
+│   └─ llm_agent.py 
 │  
-├─ config/                  # 設定/共用設定模組 
-│ └─ setting.py 
-│ ├─ edge_etl/              # 邊緣端ETL/前處理 
-│ └─ etl_to_json.py 
+├─ config/                      # 設定/共用設定模組 
+│   └─ setting.py 
 │ 
-├─ mcp_server/              # MCP伺服器API與快取 
+├─ edge_etl/                    # 邊緣端ETL/前處理 
+│   └─ etl_to_json.py 
 │ 
-├─ batch_anomaly_server.py 
-│ 
-├─ spc_summary_server.py 
-│ └─ json_cache/ 
-│ └─ .gitignore             # Git忽略規則 
+├─ mcp_server/                  # MCP伺服器API與快取 
+│   ├─ batch_anomaly_server.py 
+│   ├─ spc_summary_server.py 
+│   └─ json_cache/ 
+├─ .gitignore                   # Git忽略規則 
 </pre>
 
 ## 功能流程
