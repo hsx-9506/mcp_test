@@ -5,16 +5,32 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-(專案根)
-│
-├─ data/          # 所有原始生產資料
-├─ mcp_server/    # 所有API伺服器、agent、json快取
-├─ core/          # 資料處理/分析/重複函式
-├─ scripts/       # 批次測試/啟動腳本
-├─ .vscode/       # 開發設定
-│
-└─ (根目錄只留 README/requirements)
-
+<pre> MCP_TEST 
+│ 
+├─ README.md # 專案說明 
+├─ requirements.txt             # Python依賴 
+├─ run_guide.md                 # 操作手冊/快速指南 
+├─ 20250430產品出貨SPC/　　　   # 原始Excel資料 
+│ 
+├─ .vscode/                     # VSCode 開發設定 
+│   ├─ launch.json 
+│   └─ settings.json 
+│ 
+├─ agent_client/                # LLM Agent 端 
+│   └─ llm_agent.py 
+│  
+├─ config/                      # 設定/共用設定模組 
+│   └─ setting.py 
+│ 
+├─ edge_etl/                    # 邊緣端ETL/前處理 
+│   └─ etl_to_json.py 
+│ 
+├─ mcp_server/                  # MCP伺服器API與快取 
+│   ├─ batch_anomaly_server.py 
+│   ├─ spc_summary_server.py 
+│   └─ json_cache/ 
+└─ .gitignore                   # Git忽略規則 
+</pre>
 
 ## 功能流程
 
@@ -36,30 +52,30 @@
     pip install -r requirements.txt
     ```
 
-2. **準備 OpenAI API 金鑰**
+2. **準備 LLM API 金鑰**
 
-    - 設定環境變數：
+    - Windows cmd 設定環境變數：
       ```bash
-      export OPENAI_API_KEY=sk-xxxxxx  # Linux/Mac
-      ```
-      或在 Windows cmd：
-      ```cmd
       set OPENAI_API_KEY=sk-xxxxxx
+      ```
+      或是直接在 settings.json 修改:
+      ```bash
+      "OPENAI_API_KEY"=sk-xxxxxx
       ```
 
     - 或以 `settings.json` 搭配 `settings.py` 讀取。
 
 3. **資料前處理**
     ```bash
-    python etl_to_json.py --all
+    python edge_etl/etl_to_json.py 
     # 或
-    python etl_to_json.py --batch <批次關鍵字>
+    python edge_etl/etl_to_json.py --batch <批次關鍵字>
     ```
 
 4. **啟動 MCP-server 子服務**
     ```bash
-    uvicorn batch_anomaly_server:app --host 0.0.0.0 --port 8001
-    uvicorn spc_summary_server:app   --host 0.0.0.0 --port 8002
+    uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
+    uvicorn mcp_server.spc_summary_server:app   --host 0.0.0.0 --port 8002
     ```
 
 5. **執行 LLM 多工具整合問答**
@@ -88,5 +104,3 @@
 - 若需串接資料庫或 Redis 快取，請於 `settings.py` 擴充對應參數與連線程式。
 
 ---
-
-如有專案問題或功能建議，請於 issues 或 PR 提出！
