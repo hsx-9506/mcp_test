@@ -1,0 +1,6 @@
+20250430產品出貨SPC/
+.vscode/
+.venv/
+video.py/
+mcp_server/json_cache
+__pycache__
