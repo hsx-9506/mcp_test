@@ -5,16 +5,16 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-.
-├── etl_to_json.py # 將 Excel ETL 成標準 JSON，儲存至 json_cache/
-├── batch_anomaly_server.py # MCP-server：批次異常分析工具
-├── spc_summary_server.py # MCP-server：SPC summary 製程能力檢查工具
-├── llm_agent.py # LLM agent：拆解多子任務、串多 server、總整問答
-├── settings.py # 全域參數與 server 端點設定
-├── requirements.txt
-├── mcp_server/
-│ └── json_cache/ # 各批次 JSON 統一存放
-└── D:/project/20250430產品出貨SPC/ # (原始 Excel 資料)
+(專案根)
+│
+├─ data/          # 所有原始生產資料
+├─ mcp_server/    # 所有API伺服器、agent、json快取
+├─ core/          # 資料處理/分析/重複函式
+├─ scripts/       # 批次測試/啟動腳本
+├─ .vscode/       # 開發設定
+│
+└─ (根目錄只留 README/requirements)
+
 
 ## 功能流程
 
