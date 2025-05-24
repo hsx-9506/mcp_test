@@ -11,7 +11,6 @@ import json
 from pathlib import Path
 
 # 讀取 settings.json
-# _json_path = Path(__file__).parent / "settings.json"
 with open(".vscode/settings.json", "r", encoding="utf-8") as f:
     _config = json.load(f)
 

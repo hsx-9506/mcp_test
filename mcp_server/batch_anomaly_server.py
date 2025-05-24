@@ -9,6 +9,8 @@ MCP-server：接收 tool_call，根據 batch_id 讀取 json_cache/ 下的 JSON�
   uvicorn batch_anomaly_server:app --host 0.0.0.0 --port 8001
 """
 
+import config.setting as setting
+from pathlib import Path
 import json
 from pathlib import Path
 from typing import Dict, Any, List
@@ -19,13 +21,7 @@ import uuid
 import json
 from pathlib import Path
 
-def get_cache_dir():
-    # 請根據你的實際 settings.json 路徑調整
-    with open(".vscode/settings.json", "r", encoding="utf-8") as f:
-        config = json.load(f)
-    return Path(config.get("DATA_CACHE", "./mcp_server/json_cache"))
-
-CACHE_DIR = get_cache_dir()
+CACHE_DIR = Path(setting.DATA_CACHE)
 
 # ──────────────────────────────────────
 # MCP Tool Schema & Pydantic 模型

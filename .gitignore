@@ -4,3 +4,4 @@
 video.py/
 mcp_server/json_cache
 __pycache__
+config/settings.json

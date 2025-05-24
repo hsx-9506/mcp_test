@@ -7,6 +7,8 @@ spc_summary_server.py（嚴謹升級MCP-L2版）
   uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
 """
 
+import config.setting as setting
+from pathlib import Path
 import json
 from pathlib import Path
 from typing import Dict, Any, List
@@ -16,16 +18,7 @@ import uuid
 
 CPK_PPK_THRESHOLD = 1.33   # 製程能力異常的閾值
 
-# 讀 settings.json 配置
-def get_cache_dir():
-    import os
-    base_dir = Path(__file__).resolve().parent.parent  # mcp_server 的上一層
-    settings_path = base_dir / ".vscode" / "settings.json"
-    with open(settings_path, "r", encoding="utf-8") as f:
-        config = json.load(f)
-    return Path(config.get("DATA_CACHE", "./mcp_server/json_cache"))
-
-CACHE_DIR = get_cache_dir()
+CACHE_DIR = Path(setting.DATA_CACHE)
 
 # MCP Tool Schema & Pydantic
 class ToolCall(BaseModel):

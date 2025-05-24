@@ -3,16 +3,15 @@ import math
 import json
 import re
 import math
+import config.setting as setting
 from pathlib import Path
 import pandas as pd
 import argparse
 from datetime import datetime
 
 # 讀取設定
-with open(".vscode/settings.json", "r", encoding="utf-8") as f:
-    _config = json.load(f)
-DEFAULT_SRC = _config["DATA_SRC"]
-DEFAULT_DST = _config["DATA_CACHE"]
+DEFAULT_SRC = setting.DATA_SRC
+DEFAULT_DST = setting.DATA_CACHE
 
 def safe_str(x):
     if pd.isna(x):
