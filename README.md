@@ -5,16 +5,7 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-(專案根)
-│
-├─ data/          # 所有原始生產資料
-├─ mcp_server/    # 所有API伺服器、agent、json快取
-├─ core/          # 資料處理/分析/重複函式
-├─ scripts/       # 批次測試/啟動腳本
-├─ .vscode/       # 開發設定
-│
-└─ (根目錄只留 README/requirements)
-
+<pre> <code> 📦 <b>專案名稱（Project Name）</b> ├── <b>README.md</b> ├── <b>requirements.txt</b> ├── <b>.vscode/</b> │ └── settings.json ├── <b>data/</b> │ └── 20250430產品出貨SPC/ ├── <b>mcp_server/</b> │ ├── batch_anomaly_server.py │ ├── spc_summary_server.py │ ├── llm_agent.py │ ├── settings.py │ └── json_cache/ │ └── *.json ├── <b>core/</b> │ ├── etl_utils.py │ └── spc_utils.py ├── <b>scripts/</b> │ └── test_api.py └── <b>.gitignore</b> </code> </pre>
 
 ## 功能流程
 
