@@ -29,7 +29,7 @@
 │   ├─ batch_anomaly_server.py 
 │   ├─ spc_summary_server.py 
 │   └─ json_cache/ 
-├─ .gitignore                   # Git忽略規則 
+└─ .gitignore                   # Git忽略規則 
 </pre>
 
 ## 功能流程
