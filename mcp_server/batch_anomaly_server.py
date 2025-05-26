@@ -6,11 +6,10 @@ MCP-server：接收 tool_call，根據 batch_id 讀取 json_cache/ 下的 JSON�
 自動判斷該批次有無異常（abnormal_flag），回傳整批檢驗摘要。
 
 啟動方式：
-  uvicorn batch_anomaly_server:app --host 0.0.0.0 --port 8001
+  uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
 """
 
 import config.setting as setting
-from pathlib import Path
 import json
 from pathlib import Path
 from typing import Dict, Any, List
@@ -38,7 +37,7 @@ class ToolResult(BaseModel):
 # ──────────────────────────────────────
 # FastAPI 伺服器
 
-app = FastAPI(title="Batch Anomaly MCP-server (最嚴謹版)")
+app = FastAPI(title="Batch Anomaly MCP-server")
 
 @app.post("/tool_call", response_model=ToolResult)
 def handle_tool_call(req: ToolCall):

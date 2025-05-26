@@ -11,14 +11,14 @@ import json
 from pathlib import Path
 
 # 讀取 settings.json
-with open(".vscode/settings.json", "r", encoding="utf-8") as f:
+with open("config/settings.json", "r", encoding="utf-8") as f:
     _config = json.load(f)
 
 # 資料來源資料夾 (ETL、原始 Excel)
-DATA_DIR = _config["DATA_DIR"]
+DATA_SRC = _config["DATA_SRC"]
 
 # JSON cache 存放目錄（供 MCP-server 查詢）
-JSON_CACHE_DIR = _config["DATA_CACHE"]
+DATA_CACHE = _config["DATA_CACHE"]
 
 # MCP server endpoints
 BATCH_ANOMALY_URL = _config["BATCH_ANOMALY_URL"]
