@@ -75,12 +75,13 @@
 4. **啟動 MCP-server 子服務**
     ```bash
     uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
-    uvicorn mcp_server.spc_summary_server:app   --host 0.0.0.0 --port 8002
+    uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
+
     ```
 
 5. **執行 LLM 多工具整合問答**
     ```bash
-    python llm_agent.py --batch <批次關鍵字>
+    python -m agent_client.llm_agent --batch <批次關鍵字>
     ```
 
 ## 主要檔案說明
