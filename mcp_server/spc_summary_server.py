@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-spc_summary_server.py（嚴謹升級MCP-L2版）
+spc_summary_server.py
 
 自動彙整每批所有特徵的SPC能力統計（Cpk/Ppk），逐項判斷異常與明細，標準API回傳格式。
 啟動方式：

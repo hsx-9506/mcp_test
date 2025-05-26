@@ -11,21 +11,31 @@ import json
 from pathlib import Path
 
 # 讀取 settings.json
-with open("config/settings.json", "r", encoding="utf-8") as f:
-    _config = json.load(f)
+def load_json(fp):
+    with open(fp, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+SETTINGS_PATH = Path("config/settings.json")
+config = load_json(SETTINGS_PATH)
 
 # 資料來源資料夾 (ETL、原始 Excel)
-DATA_SRC = _config["DATA_SRC"]
+DATA_SRC = config["DATA_SRC"]
 
 # JSON cache 存放目錄（供 MCP-server 查詢）
-DATA_CACHE = _config["DATA_CACHE"]
+DATA_CACHE = config["DATA_CACHE"]
 
 # MCP server endpoints
-BATCH_ANOMALY_URL = _config["BATCH_ANOMALY_URL"]
-SPC_SUMMARY_URL = _config["SPC_SUMMARY_URL"]
+BATCH_ANOMALY_URL = config["BATCH_ANOMALY_URL"]
+SPC_SUMMARY_URL = config["SPC_SUMMARY_URL"]
+PRODUCTION_SUMMARY_URL = config["PRODUCTION_SUMMARY_URL"]
+DOWNTIME_SUMMARY_URL = config["DOWNTIME_SUMMARY_URL"]
+YIELD_SUMMARY_URL = config["YIELD_SUMMARY_URL"]
+ANOMALY_TREND_URL = config["ANOMALY_TREND_URL"]
+KPI_SUMMARY_URL = config["KPI_SUMMARY_URL"]
+ISSUE_TRACKER_URL = config["ISSUE_TRACKER_URL"]
 
 # LLM 參數
-OPENAI_API_KEY = _config["OPENAI_API_KEY"]
+OPENAI_API_KEY = config["OPENAI_API_KEY"]
 
 # 製程能力門檻（SPC）
 CPK_PPK_THRESHOLD = 1.33

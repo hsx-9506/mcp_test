@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-batch_anomaly_server.py (最嚴謹MCP-L2版)
+batch_anomaly_server.py
 
 MCP-server：接收 tool_call，根據 batch_id 讀取 json_cache/ 下的 JSON，
 自動判斷該批次有無異常（abnormal_flag），回傳整批檢驗摘要。
