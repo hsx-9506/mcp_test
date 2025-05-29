@@ -43,7 +43,7 @@ MCP_TEST
 ├─ .gitignore                     # Git忽略規則
 ├─ README.md                      # 專案說明
 ├─ requirements.txt               # Python依賴
-├─ run_guide.md                   # 操作手冊/快速指南
+└─ run_guide.md                   # 操作手冊/快速指南
 </pre>
 
 ## 功能流程
@@ -52,15 +52,7 @@ MCP_TEST
    - `edge_etl/etl_to_json.py`：將每批 Excel 轉成結構化 JSON，預先過濾、彙整並存入 `mcp_server/json_cache/`。
 
 2. **MCP-server 子服務**
-   - `mcp_server/` 目錄下各 server 檔案分別負責不同資料查詢與摘要服務，皆以 FastAPI 啟動：
-     - `batch_anomaly_server.py`：批次異常檢查與摘要。
-     - `spc_summary_server.py`：SPC 製程能力統計與異常判斷。
-     - `production_summary_server.py`：生產數量與產能彙總。
-     - `downtime_summary_server.py`：設備停機與異常時段彙整。
-     - `yield_summary_server.py`：良率統計與異常批次分析。
-     - `anomaly_trend_server.py`：異常趨勢與歷史比對。
-     - `KPI_summary_server.py`：關鍵績效指標（KPI）彙總。
-     - `issue_tracker_server.py`：異常/缺陷追蹤與處理紀錄。
+   - `mcp_server/` 目錄下各 server 檔案分別負責不同資料查詢與摘要服務，皆以 FastAPI 啟動。
 
 3. **多工具 LLM agent**
    - `agent_client/llm_agent.py`：模擬 LLM 分析問題 → 拆解子任務 → 發出多個 tool_call → 串接所有 MCP-server 回覆，整合統一回答。
@@ -113,10 +105,18 @@ MCP_TEST
 ## 主要檔案說明
 
 - **edge_etl/etl_to_json.py**：資料前處理（ETL），將 Excel 轉換成 JSON。
-- **mcp_server/*.py**：各類 MCP server，負責不同資料查詢與摘要。
 - **agent_client/llm_agent.py**：LLM agent，根據意圖自動拆解子問題、呼叫多 server 並彙整重點摘要後餵給 LLM。
 - **intent_config/intents.json**：定義 LLM 可用工具與參數。
 - **config/setting.py, settings.json**：全域參數設定。
+- **mcp_server/*.py**：各類 MCP server，負責不同資料查詢與摘要：
+  - `batch_anomaly_server.py`：批次異常檢查與摘要。
+  - `spc_summary_server.py`：SPC 製程能力統計與異常判斷。
+  - `production_summary_server.py`：生產數量與產能彙總。
+  - `downtime_summary_server.py`：設備停機與異常時段彙整。
+  - `yield_summary_server.py`：良率統計與異常批次分析。
+  - `anomaly_trend_server.py`：異常趨勢與歷史比對。
+  - `KPI_summary_server.py`：關鍵績效指標（KPI）彙總。
+  - `issue_tracker_server.py`：異常/缺陷追蹤與處理紀錄。
 
 ## 專案特色
 
