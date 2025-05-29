@@ -22,7 +22,10 @@ config = load_json(SETTINGS_PATH)
 DATA_SRC = config["DATA_SRC"]
 
 # JSON cache 存放目錄（供 MCP-server 查詢）
-DATA_CACHE = config["DATA_CACHE"]
+JSON_CACHE = config["JSON_CACHE"]
+
+# LLM 回覆模板
+INTENT_CONFIG = config["INTENT_CONFIG"]
 
 # MCP server endpoints
 BATCH_ANOMALY_URL = config["BATCH_ANOMALY_URL"]

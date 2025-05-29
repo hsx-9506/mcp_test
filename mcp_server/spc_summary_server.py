@@ -18,7 +18,7 @@ import uuid
 
 CPK_PPK_THRESHOLD = 1.33   # 製程能力異常的閾值
 
-CACHE_DIR = Path(setting.DATA_CACHE)
+CACHE_DIR = Path(setting.JSON_CACHE)
 
 # MCP Tool Schema & Pydantic
 class ToolCall(BaseModel):

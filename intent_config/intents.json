@@ -1,0 +1,24 @@
+{
+  "查詢批次異常": {
+    "tool_calls": [
+      {"tool": "batch_anomaly", "args": ["batch_id"]},
+      {"tool": "spc_summary", "args": ["batch_id"]}
+    ],
+    "prompt_template": "下方提供批次{batch_id}的檢驗異常統計與 SPC summary 資訊：\n---\n異常摘要：\n{batch_anomaly}\n---\nSPC 製程能力分析：\n{spc_summary}\n---\n請依據上述資訊，判斷該批次最可能的品質問題、是否需現場改善、以及建議的檢討/改善方向。",
+    "system_message": "你是製造現場的品質管理專家。"
+  },
+  "查詢產能達成": {
+    "tool_calls": [
+      {"tool": "production_summary", "args": ["date"]}
+    ],
+    "prompt_template": "今天的產線產能資訊如下：{production_summary}。請判斷有無產能未達標，並提出原因。",
+    "system_message": "你是產線資深主管，請聚焦產能異常解讀。"
+  },
+  "查詢良率趨勢": {
+    "tool_calls": [
+      {"tool": "yield_summary", "args": ["date"]}
+    ],
+    "prompt_template": "以下是{date}的產品良率：{yield_summary}。請說明異常原因。",
+    "system_message": "你是製程分析專家，請針對良率低落批次詳細說明。"
+  }
+}

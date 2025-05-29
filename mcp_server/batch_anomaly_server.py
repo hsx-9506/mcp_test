@@ -16,11 +16,10 @@ from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import uuid
-
 import json
 from pathlib import Path
 
-CACHE_DIR = Path(setting.DATA_CACHE)
+CACHE_DIR = Path(setting.JSON_CACHE)
 
 # ──────────────────────────────────────
 # MCP Tool Schema & Pydantic 模型
