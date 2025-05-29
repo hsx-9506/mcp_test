@@ -6,30 +6,43 @@
 
 ## 目錄結構
 <pre> MCP_TEST 
-│ 
-├─ README.md # 專案說明 
-├─ requirements.txt             # Python依賴 
-├─ run_guide.md                 # 操作手冊/快速指南 
-├─ 20250430產品出貨SPC/　　　   # 原始Excel資料 
-│ 
-├─ .vscode/                     # VSCode 開發設定 
+│
+├─ .venv/                         # Python 虛擬環境
+├─ .vscode/                       # VSCode 開發設定
 │   ├─ launch.json 
-│   └─ settings.json 
-│ 
-├─ agent_client/                # LLM Agent 端 
+│
+├─ 20250430產品出貨SPC/           # 原始Excel資料
+│
+├─ agent_client/                  # LLM Agent 端
 │   └─ llm_agent.py 
-│  
-├─ config/                      # 設定/共用設定模組 
-│   └─ setting.py 
-│ 
-├─ edge_etl/                    # 邊緣端ETL/前處理 
+│
+├─ config/                        # 設定/共用設定模組 
+│   ├─ __init__.py
+│   ├─ setting.py 
+│   └─ settings.json
+│
+├─ edge_etl/                      # 邊緣端ETL/前處理 
 │   └─ etl_to_json.py 
-│ 
-├─ mcp_server/                  # MCP伺服器API與快取 
+│
+├─ intent_config/                 # LLM意圖與工具設定
+│   └─ intents.json
+│
+├─ mcp_server/                    # MCP伺服器API與快取 
+│   ├─ __pycache__/
+│   ├─ json_cache/                # 批次快取資料
+│   ├─ anomaly_trend_server.py
 │   ├─ batch_anomaly_server.py 
+│   ├─ downtime_summary_server.py
+│   ├─ issue_tracker_server.py
+│   ├─ KPI_summary_server.py
+│   ├─ production_summary_server.py
 │   ├─ spc_summary_server.py 
-│   └─ json_cache/ 
-└─ .gitignore                   # Git忽略規則 
+│   └─ yield_summary_server.py
+│
+├─ .gitignore                     # Git忽略規則 
+├─ README.md                      # 專案說明 
+├─ requirements.txt               # Python依賴 
+├─ run_guide.md                   # 操作手冊/快速指南 
 </pre>
 
 ## 功能流程
