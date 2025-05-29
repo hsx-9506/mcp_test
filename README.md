@@ -5,105 +5,118 @@
 實現智慧問答與多源自動查詢推薦。
 
 ## 目錄結構
-<pre> MCP_TEST 
+<pre>
+MCP_TEST
 │
 ├─ .venv/                         # Python 虛擬環境
 ├─ .vscode/                       # VSCode 開發設定
-│   ├─ launch.json 
+│   └─ launch.json
 │
 ├─ 20250430產品出貨SPC/           # 原始Excel資料
 │
 ├─ agent_client/                  # LLM Agent 端
-│   └─ llm_agent.py 
+│   └─ llm_agent.py
 │
-├─ config/                        # 設定/共用設定模組 
+├─ config/                        # 設定/共用設定模組
 │   ├─ __init__.py
-│   ├─ setting.py 
+│   ├─ setting.py
 │   └─ settings.json
 │
-├─ edge_etl/                      # 邊緣端ETL/前處理 
-│   └─ etl_to_json.py 
+├─ edge_etl/                      # 邊緣端ETL/前處理
+│   └─ etl_to_json.py
 │
 ├─ intent_config/                 # LLM意圖與工具設定
 │   └─ intents.json
 │
-├─ mcp_server/                    # MCP伺服器API與快取 
+├─ mcp_server/                    # MCP伺服器API與快取
 │   ├─ __pycache__/
 │   ├─ json_cache/                # 批次快取資料
 │   ├─ anomaly_trend_server.py
-│   ├─ batch_anomaly_server.py 
+│   ├─ batch_anomaly_server.py
 │   ├─ downtime_summary_server.py
 │   ├─ issue_tracker_server.py
 │   ├─ KPI_summary_server.py
 │   ├─ production_summary_server.py
-│   ├─ spc_summary_server.py 
+│   ├─ spc_summary_server.py
 │   └─ yield_summary_server.py
 │
-├─ .gitignore                     # Git忽略規則 
-├─ README.md                      # 專案說明 
-├─ requirements.txt               # Python依賴 
-├─ run_guide.md                   # 操作手冊/快速指南 
+├─ .gitignore                     # Git忽略規則
+├─ README.md                      # 專案說明
+├─ requirements.txt               # Python依賴
+├─ run_guide.md                   # 操作手冊/快速指南
 </pre>
 
 ## 功能流程
 
 1. **資料前處理（ETL）**
-   - `etl_to_json.py` 會將每批 Excel 轉成結構化 JSON，預先過濾、彙整並存入 `json_cache/`。
+   - `edge_etl/etl_to_json.py`：將每批 Excel 轉成結構化 JSON，預先過濾、彙整並存入 `mcp_server/json_cache/`。
 
 2. **MCP-server 子服務**
-   - `batch_anomaly_server.py`：回應單批異常統計與明細。
-   - `spc_summary_server.py`：回應單批 SPC（Cpk, Ppk）製程能力摘要。
+   - `mcp_server/` 目錄下各 server 檔案分別負責不同資料查詢與摘要服務，皆以 FastAPI 啟動：
+     - `batch_anomaly_server.py`：批次異常檢查與摘要。
+     - `spc_summary_server.py`：SPC 製程能力統計與異常判斷。
+     - `production_summary_server.py`：生產數量與產能彙總。
+     - `downtime_summary_server.py`：設備停機與異常時段彙整。
+     - `yield_summary_server.py`：良率統計與異常批次分析。
+     - `anomaly_trend_server.py`：異常趨勢與歷史比對。
+     - `KPI_summary_server.py`：關鍵績效指標（KPI）彙總。
+     - `issue_tracker_server.py`：異常/缺陷追蹤與處理紀錄。
 
 3. **多工具 LLM agent**
-   - `llm_agent.py` 會模擬 LLM 分析問題 → 拆解子任務 → 發出多個 tool_call → 串接所有 MCP-server 回覆，整合統一回答。
+   - `agent_client/llm_agent.py`：模擬 LLM 分析問題 → 拆解子任務 → 發出多個 tool_call → 串接所有 MCP-server 回覆，整合統一回答。
 
-## 安裝說明
+4. **意圖與工具設定**
+   - `intent_config/intents.json`：定義 LLM 可用的工具（server）與參數，支援彈性擴充。
+
+## 安裝與執行
 
 1. **安裝必要套件**
-
     ```bash
     pip install -r requirements.txt
     ```
 
 2. **準備 LLM API 金鑰**
-
     - Windows cmd 設定環境變數：
       ```cmd
       set OPENAI_API_KEY=sk-xxxxxx
       ```
-      或是直接在 settings.json 修改:
-      ```bash
-      "OPENAI_API_KEY"=sk-xxxxxx
-      ```
-
-    - 或以 `settings.json` 搭配 `settings.py` 讀取。
+    - 或直接在 `config/settings.json` 設定 `"OPENAI_API_KEY"`。
 
 3. **資料前處理**
     ```bash
-    python edge_etl/etl_to_json.py 
+    python edge_etl/etl_to_json.py
     # 或
     python edge_etl/etl_to_json.py --batch <批次關鍵字>
     ```
 
-4. **啟動 MCP-server 子服務**
+4. **啟動 MCP-server 子服務（可多開）**
     ```bash
     uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
     uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
-
+    # 其他 server 依需求啟動
     ```
 
 5. **執行 LLM 多工具整合問答**
-    ```bash
-    python -m agent_client.llm_agent --batch <批次關鍵字>
-    ```
+    - 處理全部批次：
+      ```bash
+      python -m agent_client.llm_agent
+      ```
+    - 處理指定批次：
+      ```bash
+      python -m agent_client.llm_agent --batch 02,03,05
+      ```
+    - 指定意圖（如有多種 intent）：
+      ```bash
+      python -m agent_client.llm_agent --intent 查詢批次異常
+      ```
 
 ## 主要檔案說明
 
-- **etl_to_json.py**：資料前處理（ETL），將所有 Excel 整批轉換成 JSON，便於 MCP server 高效查詢。
-- **batch_anomaly_server.py**：查詢批次各項目異常狀態。
-- **spc_summary_server.py**：查詢製程能力指標，判斷有無 SPC 異常。
-- **llm_agent.py**：模擬 LLM 將用戶問題拆解為多個子工具調用，串多 server 回傳給 LLM 統一分析。
-- **settings.py**：全域參數設定，方便多程式共用與集中管理。
+- **edge_etl/etl_to_json.py**：資料前處理（ETL），將 Excel 轉換成 JSON。
+- **mcp_server/*.py**：各類 MCP server，負責不同資料查詢與摘要。
+- **agent_client/llm_agent.py**：LLM agent，根據意圖自動拆解子問題、呼叫多 server 並彙整重點摘要後餵給 LLM。
+- **intent_config/intents.json**：定義 LLM 可用工具與參數。
+- **config/setting.py, settings.json**：全域參數設定。
 
 ## 專案特色
 
