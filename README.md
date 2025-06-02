@@ -87,6 +87,10 @@ MCP_TEST
     uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
     uvicorn mcp_server.production_summary_server:app --host 0.0.0.0 --port 8003
     uvicorn mcp_server.downtime_summary_server:app --host 0.0.0.0 --port 8004
+    uvicorn mcp_server.yield_summary_server:app --host 0.0.0.0 --port 8005
+    uvicorn mcp_server.anomaly_trend_server:app --host 0.0.0.0 --port 8006
+    uvicorn mcp_server.KPI_summary_server:app --host 0.0.0.0 --port 8007
+    uvicorn mcp_server.issue_tracker_server:app --host 0.0.0.0 --port 8008
     # 其他 server 依需求啟動
     ```
 

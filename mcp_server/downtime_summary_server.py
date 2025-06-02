@@ -1,13 +1,3 @@
-#!/usr/bin/env python3
-"""
-downtime_summary_server.py
-
-自動彙整指定日期的設備停機資料，回傳所有停機紀錄（可含機台、產線、停機時數等）。
-標準 API 回傳格式，支援 LLM 多工具自動化查詢。
-啟動方式：
-  uvicorn mcp_server.downtime_summary_server:app --host 0.0.0.0 --port 8004
-"""
-
 import config.setting as setting
 import pandas as pd
 from pathlib import Path
@@ -16,8 +6,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 import uuid
 
-# 設定停機資料來源目錄
-DATA_DIR = Path(setting.DOWNTIME_SUMMARY_URL)
+# 設定資料來源資料夾
+DATA_DIR = Path(setting.MOCK_DOWNTIME_SUMMARY)
 
 # MCP Tool Schema & Pydantic 模型
 class ToolCall(BaseModel):
@@ -31,7 +21,7 @@ class ToolResult(BaseModel):
     status: str
     data: List[Dict[str, Any]]
 
-# FastAPI 伺服器
+# 建立 FastAPI 伺服器
 app = FastAPI(title="Downtime Summary MCP-server")
 
 # 路由：處理工具呼叫
@@ -52,9 +42,7 @@ def handle_tool_call(req: ToolCall):
     except Exception as e:
         raise HTTPException(500, f"Failed to read downtime data: {e}")
 
-    # 可進一步篩選/排序（如取停機時數TOP N、篩某產線等）
     records = df.to_dict(orient="records")
-    # 預設全部回傳，建議由 agent/LLM 再排序/摘要
     return ToolResult(
         trace_id=req.trace_id,
         status="OK",

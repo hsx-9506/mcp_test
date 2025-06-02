@@ -19,10 +19,9 @@ import uuid
 import json
 from pathlib import Path
 
-# 設定 JSON cache 存放目錄
+# JSON cache 存放資料夾路徑
 CACHE_DIR = Path(setting.JSON_CACHE)
 
-# ──────────────────────────────────────
 # MCP Tool Schema & Pydantic 模型
 class ToolCall(BaseModel):
     trace_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -34,11 +33,9 @@ class ToolResult(BaseModel):
     status: str
     data: List[Dict[str, Any]]
 
-# ──────────────────────────────────────
-# FastAPI 伺服器
+# 建立 FastAPI 伺服器
 app = FastAPI(title="Batch Anomaly MCP-server")
 
-# ──────────────────────────────────────
 # 路由：處理工具呼叫
 @app.post("/tool_call", response_model=ToolResult)
 def handle_tool_call(req: ToolCall):
@@ -95,8 +92,7 @@ def handle_tool_call(req: ToolCall):
         data=[summary_result]
     )
 
-# ──────────────────────────────────────
-# 主程式（可選）
+# 啟動 FastAPI 伺服器
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)

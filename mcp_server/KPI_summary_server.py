@@ -1,24 +1,42 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Any, Dict
+from typing import Any, Dict, List
 import config.setting as setting
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
+import uuid
 
-app = FastAPI()
+# KPI Summary Server
+DATA_DIR = Path(setting.MOCK_KPI_SUMMARY)
 
+# MCP Tool Schema & Pydantic 模型
 class ToolCall(BaseModel):
-    trace_id: str
+    trace_id: str = str(uuid.uuid4())
     tool: str
     args: Dict[str, Any]
 
-@app.post("/tool_call")
+# ToolResult Schema
+class ToolResult(BaseModel):
+    trace_id: str
+    status: str
+    data: List[Dict[str, Any]]
+
+# 建立 FastAPI 伺服器
+app = FastAPI()
+
+# 將字串轉為 datetime 物件
+@app.post("/tool_call", response_model=ToolResult)
 def tool_call(payload: ToolCall):
     batch_date = payload.args.get("date", datetime.now().strftime("%Y-%m-%d"))
-    target_path = Path(setting.KPI_SUMMARY_URL) / f"{batch_date}.csv"
+    target_path = DATA_DIR / f"{batch_date}.csv"
     if not target_path.exists():
-        return {"trace_id": payload.trace_id, "status": "NO_DATA", "data": []}
+        return ToolResult(trace_id=payload.trace_id, status="NO_DATA", data=[])
     df = pd.read_csv(target_path)
     data = df.to_dict(orient="records")
-    return {"trace_id": payload.trace_id, "status": "OK", "data": data}
+    return ToolResult(trace_id=payload.trace_id, status="OK", data=data)
+
+# 啟動 FastAPI 伺服器
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8007)

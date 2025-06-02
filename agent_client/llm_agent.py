@@ -9,9 +9,6 @@ import argparse
 # ──────────────────────────────────────
 # 載入 LLM 回覆模板
 def load_intent_config(intent_name, config_path=None):
-    """
-    讀取意圖設定檔，取得指定 intent 的工具呼叫與 prompt 設定。
-    """
     if config_path is None:
         config_path = setting.INTENT_CONFIG
     with open(config_path, "r", encoding="utf-8") as f:
@@ -21,17 +18,11 @@ def load_intent_config(intent_name, config_path=None):
 # ──────────────────────────────────────
 # 取得使用者輸入的參數值
 def get_arg_value(arg_name, user_input_dict):
-    """
-    從使用者輸入字典中取得指定參數的值。
-    """
     return user_input_dict.get(arg_name, "")
 
 # ──────────────────────────────────────
 # 呼叫 MCP server 取得工具結果
 def call_server(tool, args):
-    """
-    根據 tool 名稱與參數，呼叫對應的 MCP server 並取得回傳結果。
-    """
     url_map = {
         "batch_anomaly": setting.BATCH_ANOMALY_URL,
         "spc_summary": setting.SPC_SUMMARY_URL,
@@ -58,29 +49,134 @@ def call_server(tool, args):
         return {"status": "ERROR", "data": str(e)}
 
 # ──────────────────────────────────────
-# 根據不同 tool 彈性摘要回傳結果
+# 彈性摘要各種 tool 的回傳結果（全 tool 支援）
 def summarize_tool_result(tool, tool_result):
-    """
-    根據不同 tool 彈性摘要回傳結果，僅保留重點資訊。
-    """
     if tool_result.get("status") != "OK":
         return f"【無資料/異常: {tool_result.get('data','')}】"
-    # 針對不同 tool 可自訂重點
+    data = tool_result.get("data", [])
+
     if tool == "batch_anomaly":
-        data = tool_result.get("data", [{}])[0]
-        return f"異常數: {data.get('abnormal_count', 0)}, 特徵: {data.get('abnormal_features', [])}"
-    elif tool == "spc_summary":
-        data = tool_result.get("data", [{}])[0]
-        return f"SPC異常數: {data.get('abnormal_count', 0)}, SPC異常: {data.get('abnormal_spc', [])}"
-    # 其他工具可依需求擴充
-    return json.dumps(tool_result.get("data"), ensure_ascii=False)
+        if not data:
+            return "本批次無異常資料"
+        item = data[0]
+        result = [
+            f"批次：{item.get('batch_id', '')}",
+            f"產品：{item.get('product_name', '')}",
+            f"機台：{item.get('machine_id', '')}",
+            f"異常數：{item.get('abnormal_count', 0)}"
+        ]
+        if item.get("abnormal_features"):
+            result.append("異常明細：")
+            for f in item["abnormal_features"]:
+                desc = f"- 特性：{f.get('feature_name', '')} (Cpk={f.get('cpk', '')})"
+                if f.get("cpk_alert"):
+                    desc += f" [Cpk警告: {f.get('cpk_reason', '')}]"
+                if f.get("ppk_alert"):
+                    desc += f" [Ppk警告: {f.get('ppk_reason', '')}]"
+                if f.get("abnormal_detail"):
+                    desc += f" | 明細: {','.join([str(x) for x in f['abnormal_detail']])}"
+                result.append(desc)
+        else:
+            result.append("本批次無異常特性")
+        return "\n".join(result)
+
+    if tool == "spc_summary":
+        if not data:
+            return "無 SPC 製程能力資料"
+        item = data[0]
+        lines = [
+            f"批次：{item.get('batch_id', '')}",
+            f"產品：{item.get('product_name', '')}",
+            f"機台：{item.get('machine_id', '')}",
+            f"SPC項目數：{item.get('total_spc_items', 0)}",
+        ]
+        if "spc_items" in item:
+            for spc in item["spc_items"]:
+                lines.append(f"- 特性：{spc.get('feature_name', '')} | Cpk={spc.get('cpk', '')} | Ppk={spc.get('ppk', '')} | 警告: {'是' if spc.get('cpk_alert') else '否'}")
+        else:
+            lines.append("無 SPC 明細")
+        return "\n".join(lines)
+
+    if tool == "production_summary":
+        if not data:
+            return "本日無產能資料"
+        header = ["機台", "產線", "班別", "目標產量", "實際產量", "達成率(%)"]
+        rows = [
+            [row.get("machine_id", ""), row.get("line", ""), row.get("shift", ""),
+             row.get("target_qty", ""), row.get("actual_qty", ""), row.get("achieve_rate", "")]
+            for row in data
+        ]
+        table = "\t".join(header) + "\n"
+        for r in rows:
+            table += "\t".join([str(x) for x in r]) + "\n"
+        return table
+
+    if tool == "downtime_summary":
+        if not data:
+            return "本日無停機紀錄"
+        header = ["機台", "產線", "班別", "停機次數", "停機總時數(分鐘)", "主因", "備註"]
+        rows = [
+            [row.get("machine_id", ""), row.get("line", ""), row.get("shift", ""), row.get("event_count", ""),
+             row.get("total_minutes", ""), row.get("main_reason", ""), row.get("remark", "")]
+            for row in data
+        ]
+        table = "\t".join(header) + "\n"
+        for r in rows:
+            table += "\t".join([str(x) for x in r]) + "\n"
+        return table
+
+    if tool == "yield_summary":
+        if not data:
+            return "本日無良率紀錄"
+        header = ["產品", "產線", "班別", "良品數", "不良品數", "良率(%)"]
+        rows = [
+            [row.get("product", ""), row.get("line", ""), row.get("shift", ""),
+             row.get("good_qty", ""), row.get("ng_qty", ""), row.get("yield_percent", "")]
+            for row in data
+        ]
+        table = "\t".join(header) + "\n"
+        for r in rows:
+            table += "\t".join([str(x) for x in r]) + "\n"
+        return table
+
+    if tool == "anomaly_trend":
+        if not data:
+            return "區間內無異常事件"
+        header = ["日期", "機台", "產線", "異常類型", "異常代碼", "次數", "備註"]
+        rows = [
+            [row.get("date",""), row.get("machine_id", ""), row.get("line", ""), row.get("event_type", ""),
+             row.get("abnormal_code", ""), row.get("count", ""), row.get("remark", "")]
+            for row in data
+        ]
+        table = "\t".join(header) + "\n"
+        for r in rows:
+            table += "\t".join([str(x) for x in r]) + "\n"
+        return table
+
+    if tool == "KPI_summary":
+        if not data:
+            return "本日無KPI紀錄"
+        header = list(data[0].keys())
+        table = "\t".join(header) + "\n"
+        for row in data:
+            table += "\t".join([str(row.get(h, "")) for h in header]) + "\n"
+        return table
+
+    if tool == "issue_tracker":
+        if not data:
+            return "無未結案工單"
+        header = list(data[0].keys())
+        table = "\t".join(header) + "\n"
+        for row in data:
+            table += "\t".join([str(row.get(h, "")) for h in header]) + "\n"
+        return table
+
+    # fallback
+    return json.dumps(data, ensure_ascii=False, indent=2) if data else "無資料"
 
 # ──────────────────────────────────────
-# 彙整單一批次所有 tool 的重點摘要
+# 彙總批次的各工具摘要
 def summarize_batch_context(batch_id, tool_results: Dict[str, str]):
-    """
-    彙整單一批次所有 tool 的重點摘要，組成一段文字。
-    """
     summary = f"批次「{batch_id}」：\n"
     for tool, summary_text in tool_results.items():
         summary += f"{tool}摘要：{summary_text}\n"
@@ -89,9 +185,6 @@ def summarize_batch_context(batch_id, tool_results: Dict[str, str]):
 # ──────────────────────────────────────
 # 呼叫 LLM 生成建議
 def call_llm(prompt, system_msg, api_key=None, model="gpt-4"):
-    """
-    呼叫 OpenAI LLM，傳入 prompt 與 system message，取得回覆內容。
-    """
     import openai
     api_key = api_key or setting.OPENAI_API_KEY
     client = openai.OpenAI(api_key=api_key)
@@ -134,22 +227,23 @@ if __name__ == "__main__":
                 k, v = item.split("=", 1)
                 extra_dict[k] = v
 
+    # 載入意圖配置
     intent = load_intent_config(args.intent)
     if not intent:
         print(f"[錯誤] 找不到 intent: {args.intent}")
         exit(1)
 
+    # 檢查必要的工具呼叫
     all_batch_summaries = []
     for batch_id in batch_ids:
         user_input_dict = {"batch_id": batch_id}
-        user_input_dict.update(extra_dict)  # 支援多參數
+        user_input_dict.update(extra_dict)
         tool_results = {}
         for call in intent["tool_calls"]:
             tool = call["tool"]
             args_dict = {arg: get_arg_value(arg, user_input_dict) for arg in call["args"]}
             tool_result = call_server(tool, args_dict)
             tool_results[tool] = summarize_tool_result(tool, tool_result)
-        # 彙整單一批次所有 tool 的重點
         all_batch_summaries.append(summarize_batch_context(batch_id, tool_results))
 
     # 組合所有批次的重點摘要
