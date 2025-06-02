@@ -18,6 +18,7 @@ import uuid
 
 CPK_PPK_THRESHOLD = 1.33   # 製程能力異常的閾值
 
+# 設定 JSON cache 存放目錄
 CACHE_DIR = Path(setting.JSON_CACHE)
 
 # MCP Tool Schema & Pydantic
@@ -34,6 +35,7 @@ class ToolResult(BaseModel):
 # FastAPI 伺服器
 app = FastAPI(title="SPC Summary MCP-server")
 
+# 路由：處理工具呼叫
 @app.post("/tool_call", response_model=ToolResult)
 def handle_tool_call(req: ToolCall):
     if req.tool != "spc_summary":

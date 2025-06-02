@@ -19,6 +19,7 @@ import uuid
 import json
 from pathlib import Path
 
+# 設定 JSON cache 存放目錄
 CACHE_DIR = Path(setting.JSON_CACHE)
 
 # ──────────────────────────────────────
@@ -35,9 +36,10 @@ class ToolResult(BaseModel):
 
 # ──────────────────────────────────────
 # FastAPI 伺服器
-
 app = FastAPI(title="Batch Anomaly MCP-server")
 
+# ──────────────────────────────────────
+# 路由：處理工具呼叫
 @app.post("/tool_call", response_model=ToolResult)
 def handle_tool_call(req: ToolCall):
     if req.tool != "batch_anomaly":

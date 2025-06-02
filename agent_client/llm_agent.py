@@ -6,17 +6,32 @@ import config.setting as setting
 from typing import Dict, Any
 import argparse
 
+# ──────────────────────────────────────
+# 載入 LLM 回覆模板
 def load_intent_config(intent_name, config_path=None):
+    """
+    讀取意圖設定檔，取得指定 intent 的工具呼叫與 prompt 設定。
+    """
     if config_path is None:
         config_path = setting.INTENT_CONFIG
     with open(config_path, "r", encoding="utf-8") as f:
         intents = json.load(f)
     return intents.get(intent_name, None)
 
+# ──────────────────────────────────────
+# 取得使用者輸入的參數值
 def get_arg_value(arg_name, user_input_dict):
+    """
+    從使用者輸入字典中取得指定參數的值。
+    """
     return user_input_dict.get(arg_name, "")
 
+# ──────────────────────────────────────
+# 呼叫 MCP server 取得工具結果
 def call_server(tool, args):
+    """
+    根據 tool 名稱與參數，呼叫對應的 MCP server 並取得回傳結果。
+    """
     url_map = {
         "batch_anomaly": setting.BATCH_ANOMALY_URL,
         "spc_summary": setting.SPC_SUMMARY_URL,
@@ -42,8 +57,12 @@ def call_server(tool, args):
     except Exception as e:
         return {"status": "ERROR", "data": str(e)}
 
+# ──────────────────────────────────────
+# 根據不同 tool 彈性摘要回傳結果
 def summarize_tool_result(tool, tool_result):
-    # 根據不同 tool 彈性摘要
+    """
+    根據不同 tool 彈性摘要回傳結果，僅保留重點資訊。
+    """
     if tool_result.get("status") != "OK":
         return f"【無資料/異常: {tool_result.get('data','')}】"
     # 針對不同 tool 可自訂重點
@@ -56,14 +75,23 @@ def summarize_tool_result(tool, tool_result):
     # 其他工具可依需求擴充
     return json.dumps(tool_result.get("data"), ensure_ascii=False)
 
+# ──────────────────────────────────────
+# 彙整單一批次所有 tool 的重點摘要
 def summarize_batch_context(batch_id, tool_results: Dict[str, str]):
-    # 彙整單一批次所有 tool 的重點
+    """
+    彙整單一批次所有 tool 的重點摘要，組成一段文字。
+    """
     summary = f"批次「{batch_id}」：\n"
     for tool, summary_text in tool_results.items():
         summary += f"{tool}摘要：{summary_text}\n"
     return summary
 
+# ──────────────────────────────────────
+# 呼叫 LLM 生成建議
 def call_llm(prompt, system_msg, api_key=None, model="gpt-4"):
+    """
+    呼叫 OpenAI LLM，傳入 prompt 與 system message，取得回覆內容。
+    """
     import openai
     api_key = api_key or setting.OPENAI_API_KEY
     client = openai.OpenAI(api_key=api_key)
@@ -81,10 +109,13 @@ def call_llm(prompt, system_msg, api_key=None, model="gpt-4"):
     except Exception as e:
         return f"[LLM呼叫失敗] {str(e)}"
 
+# ──────────────────────────────────────
+# 主程式入口
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch", help="批次ID，多個用逗號分隔。不指定則自動抓全部。")
     parser.add_argument("--intent", default="查詢批次異常", help="意圖名稱")
+    parser.add_argument("--extra", nargs="*", help="其他參數，如 date=2024-05-28")
     args = parser.parse_args()
 
     # 取得所有批次ID
@@ -95,6 +126,14 @@ if __name__ == "__main__":
         batch_ids = [f.stem for f in cache_dir.glob("*.json")]
         batch_ids.sort()
 
+    # 處理額外參數
+    extra_dict = {}
+    if args.extra:
+        for item in args.extra:
+            if "=" in item:
+                k, v = item.split("=", 1)
+                extra_dict[k] = v
+
     intent = load_intent_config(args.intent)
     if not intent:
         print(f"[錯誤] 找不到 intent: {args.intent}")
@@ -103,6 +142,7 @@ if __name__ == "__main__":
     all_batch_summaries = []
     for batch_id in batch_ids:
         user_input_dict = {"batch_id": batch_id}
+        user_input_dict.update(extra_dict)  # 支援多參數
         tool_results = {}
         for call in intent["tool_calls"]:
             tool = call["tool"]
