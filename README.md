@@ -85,6 +85,8 @@ MCP_TEST
     ```bash
     uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
     uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
+    uvicorn mcp_server.production_summary_server:app --host 0.0.0.0 --port 8003
+    uvicorn mcp_server.downtime_summary_server:app --host 0.0.0.0 --port 8004
     # 其他 server 依需求啟動
     ```
 
