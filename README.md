@@ -29,7 +29,6 @@ MCP_TEST
 │   └─ intents.json
 │
 ├─ mcp_server/                    # MCP伺服器API與快取
-│   ├─ __pycache__/
 │   ├─ json_cache/                # 批次快取資料
 │   ├─ anomaly_trend_server.py
 │   ├─ batch_anomaly_server.py
@@ -39,6 +38,13 @@ MCP_TEST
 │   ├─ production_summary_server.py
 │   ├─ spc_summary_server.py
 │   └─ yield_summary_server.py
+│
+├─ mock_data/                     # 測試/模擬資料根目錄
+│   ├─ downtime_summary/          # 停機資料
+│   ├─ issue_tracker/             # 缺陷/異常追蹤資料
+│   ├─ KPI_summary/               # KPI資料
+│   ├─ production_summary/        # 生產數據
+│   └─ yield_summary/             # 良率資料
 │
 ├─ .gitignore                     # Git忽略規則
 ├─ README.md                      # 專案說明
