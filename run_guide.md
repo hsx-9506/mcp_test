@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 ## 2. 設定 OpenAI API 金鑰
 
-本系統需要 LLM API 金鑰，請申請並設為環境變數。
+本系統需要 LLM API 金鑰，請申請並設為環境變數或於設定檔中填寫。
 
 #### Windows 命令提示字元
 
@@ -26,9 +26,9 @@ pip install -r requirements.txt
 set OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-#### settings.json檔案
+#### 或於 settings.json 檔案設定
 
-請於 `settings.json` 檔案中設定 `"OPENAI_API_KEY": "sk-xxxxxxx"`
+請於 `config/settings.json` 檔案中設定 `"OPENAI_API_KEY": "sk-xxxxxxx"`
 
 > 請將 `sk-xxxxxxxx` 替換為你的 OpenAI 真實 API 金鑰
 
@@ -36,49 +36,56 @@ set OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ## 3. 資料前處理（Excel ➔ JSON）
 
-本專案預設資料夾為 `D:/project/20250430產品出貨SPC/`。請確認有放置所有欲分析的 Excel 檔案。
+請將所有欲分析的 Excel 檔案放入預設資料夾（如 `20250430產品出貨SPC/`）。
 
 ### 3.1 批次轉換全部 Excel
 
 ```bash
 python edge_etl/etl_to_json.py
+# 或
+python edge_etl/etl_to_json.py --batch <批次關鍵字>
 ```
 
-> 轉換後資料會自動存入 `json_cache/` 供 MCP-server 讀取加速查詢
-> 若加 `--export-json`，會同時產出批次的 JSON 檔
+> 轉換後資料會自動存入 `mcp_server/json_cache/` 供 MCP-server 讀取加速查詢
 
 ---
 
 ## 4. 啟動 MCP-server 多工具服務
 
-請開**兩個命令視窗**，各自啟動下列服務：
-
-### 4.1 啟動批次異常分析服務
+請分別於多個命令視窗啟動下列服務（可依需求選擇）：
 
 ```bash
 uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
-```
-
-### 4.2 啟動 SPC 製程能力檢查服務
-
-```bash
 uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
+uvicorn mcp_server.production_summary_server:app --host 0.0.0.0 --port 8003
+uvicorn mcp_server.downtime_summary_server:app --host 0.0.0.0 --port 8004
+uvicorn mcp_server.yield_summary_server:app --host 0.0.0.0 --port 8005
+uvicorn mcp_server.anomaly_trend_server:app --host 0.0.0.0 --port 8006
+uvicorn mcp_server.KPI_summary_server:app --host 0.0.0.0 --port 8007
+uvicorn mcp_server.issue_tracker_server:app --host 0.0.0.0 --port 8008
 ```
 
-> 若需變更 port 或加參數，請修改 `settings.py` 內對應設定
-> 每個服務預設會從 `json_cache/` 讀取資料
+> 每個服務預設會從 `mcp_server/json_cache/` 讀取資料。  
+> 若需變更 port 或資料來源，請修改 `config/settings.json` 或 `config/setting.py`。
 
 ---
 
 ## 5. 啟動 LLM 多工具 Agent 整合查詢
 
-此步驟將由 LLM 進行語意拆解、發出多個 tool\_call，整合所有 MCP-server 回覆並輸出建議。
+此步驟將由 LLM 進行語意拆解、發出多個 tool_call，整合所有 MCP-server 回覆並輸出建議。
 
-```bash
-python llm_agent.py --batch D42991
-```
-
-> 請將 `D42991` 改為你想分析的實際批次號（或產品批次關鍵字）
+- 處理全部批次：
+  ```bash
+  python -m agent_client.llm_agent
+  ```
+- 處理指定批次：
+  ```bash
+  python -m agent_client.llm_agent --batch 02,03,05
+  ```
+- 指定意圖（如有多種 intent）：
+  ```bash
+  python -m agent_client.llm_agent --intent 查詢批次異常
+  ```
 
 ---
 
@@ -100,41 +107,27 @@ LLM agent 執行結束後，終端機將自動輸出異常原因、SPC 結果、
   * 檢查 server 是否成功啟動，且無其他程式佔用對應 port。
 
 * **欲更換資料來源/Excel 路徑：**
-  * 修改 `settings.py` 或主程式中 `DATA_DIR` 參數。
+  * 修改 `config/settings.json` 或主程式中 `DATA_DIR` 參數。
 
 * **LLM 無回應：**
   * 檢查 API 配額與金鑰。
 
 ---
 
-## 8. 簡易流程圖
+## 8. 重要檔案說明
 
-資料前處理（Excel → JSON 快取）
-　　↓
-啟動 MCP 多工具服務（批次異常 / SPC）
-　　↓
-LLM 拆解問題、發多次 tool\_call → 串接 MCP-server
-　　↓
-LLM 統一回覆異常分析與改善建議
-　　↓
-終端機輸出完整回應
-
----
-
-## 9. 重要檔案說明
-
-* `etl_to_json.py`：批次轉換 Excel → JSON
-* `batch_anomaly_server.py`：批次異常分析 REST 服務
-* `spc_summary_server.py`：SPC 製程能力檢查 REST 服務
-* `llm_agent.py`：自動語意拆解、發 tool\_call、整合回應
-* `settings.py`：全域參數（含 API 路徑、資料夾）
-* `json_cache/`：所有前處理好的 JSON 批次資料
+- `edge_etl/etl_to_json.py`：資料前處理（ETL），將 Excel 轉換成 JSON。
+- `agent_client/llm_agent.py`：LLM agent，根據意圖自動拆解子問題、呼叫多 server 並彙整重點摘要後餵給 LLM。
+- `intent_config/intents.json`：定義 LLM 可用工具與參數。
+- `config/setting.py, settings.json`：全域參數設定。
+- `mcp_server/*.py`：各類 MCP server，負責不同資料查詢與摘要。
+- `mcp_server/json_cache/`：所有前處理好的 JSON 批次資料。
 
 ---
 
 ## 備註
 
-* 可於 `settings.py`/`settings.json` 調整資料目錄、API 端點、快取策略等參數。
+* 可於 `config/setting.py`/`settings.json` 調整資料目錄、API 端點、快取策略等參數。
 * 若需支援資料庫/Redis/向量庫，請參考擴充說明或聯繫開發者。
 * 建議以 Python 3.9+ 執行本專案。
 * 建議於虛擬環境（venv/conda）安裝測試。
