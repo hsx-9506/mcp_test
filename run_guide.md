@@ -114,20 +114,4 @@ LLM agent 執行結束後，終端機將自動輸出異常原因、SPC 結果、
 
 ---
 
-## 8. 重要檔案說明
-
-- `edge_etl/etl_to_json.py`：資料前處理（ETL），將 Excel 轉換成 JSON。
-- `agent_client/llm_agent.py`：LLM agent，根據意圖自動拆解子問題、呼叫多 server 並彙整重點摘要後餵給 LLM。
-- `intent_config/intents.json`：定義 LLM 可用工具與參數。
-- `config/setting.py, settings.json`：全域參數設定。
-- `mcp_server/*.py`：各類 MCP server，負責不同資料查詢與摘要。
-- `mcp_server/json_cache/`：所有前處理好的 JSON 批次資料。
-
----
-
-## 備註
-
-* 可於 `config/setting.py`/`settings.json` 調整資料目錄、API 端點、快取策略等參數。
-* 若需支援資料庫/Redis/向量庫，請參考擴充說明或聯繫開發者。
-* 建議以 Python 3.9+ 執行本專案。
-* 建議於虛擬環境（venv/conda）安裝測試。
+> 詳細專案架構、功能說明與檔案介紹請參考 [README.md](README.md)
