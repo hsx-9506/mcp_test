@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+issue_tracker_server.py
+
+自動彙整所有未結案的異常/缺陷工單，回傳工單明細。
+標準 API 回傳格式，支援 LLM 多工具自動化查詢。
+
+啟動方式：
+  uvicorn mcp_server.issue_tracker_server:app --host 0.0.0.0 --port 8008
+"""
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Any, Dict, List

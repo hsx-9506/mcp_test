@@ -177,9 +177,26 @@ def summarize_tool_result(tool, tool_result):
 # ──────────────────────────────────────
 # 彙總批次的各工具摘要
 def summarize_batch_context(batch_id, tool_results: Dict[str, str]):
-    summary = f"批次「{batch_id}」：\n"
-    for tool, summary_text in tool_results.items():
-        summary += f"{tool}摘要：{summary_text}\n"
+    # 只擷取異常數與SPC警告數等重點
+    batch_anomaly = tool_results.get("batch_anomaly", "")
+    spc_summary = tool_results.get("spc_summary", "")
+
+    # 擷取異常數
+    abnormal_count = 0
+    if "異常數：" in batch_anomaly:
+        try:
+            abnormal_count = int(batch_anomaly.split("異常數：")[1].split("\n")[0])
+        except Exception:
+            abnormal_count = 0
+
+    # 擷取SPC警告數
+    spc_alert_count = 0
+    if "警告: 是" in spc_summary:
+        spc_alert_count = spc_summary.count("警告: 是")
+
+    summary = (
+        f"批次：{batch_id} | 異常數：{abnormal_count} | SPC警告數：{spc_alert_count}\n"
+    )
     return summary
 
 # ──────────────────────────────────────

@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+production_summary_server.py
+
+自動彙整指定日期的生產數據，回傳每台機台、產線、班別的目標產量、實際產量與達成率。
+標準 API 回傳格式，支援 LLM 多工具自動化查詢。
+
+啟動方式：
+  uvicorn mcp_server.production_summary_server:app --host 0.0.0.0 --port 8003
+"""
+
 import config.setting as setting
 import pandas as pd
 from pathlib import Path

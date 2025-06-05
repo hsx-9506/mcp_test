@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+downtime_summary_server.py
+
+自動彙整指定日期的設備停機資料，回傳所有停機紀錄（可含機台、產線、停機時數等）。
+標準 API 回傳格式，支援 LLM 多工具自動化查詢。
+
+啟動方式：
+  uvicorn mcp_server.downtime_summary_server:app --host 0.0.0.0 --port 8004
+"""
+
 import config.setting as setting
 import pandas as pd
 from pathlib import Path

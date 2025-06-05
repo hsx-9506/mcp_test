@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+KPI_summary_server.py
+
+自動彙整指定日期的關鍵績效指標（KPI）資料，回傳各項KPI統計。
+標準 API 回傳格式，支援 LLM 多工具自動化查詢。
+
+啟動方式：
+  uvicorn mcp_server.KPI_summary_server:app --host 0.0.0.0 --port 8007
+"""
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, List

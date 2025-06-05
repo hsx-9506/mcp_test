@@ -1,3 +1,14 @@
+#!/usr/bin/env python3
+"""
+yield_summary_server.py
+
+自動彙整指定日期的良率資料，回傳所有產品/產線/班別的良率統計與異常批次。
+標準 API 回傳格式，支援 LLM 多工具自動化查詢。
+
+啟動方式：
+  uvicorn mcp_server.yield_summary_server:app --host 0.0.0.0 --port 8005
+"""
+
 import config.setting as setting
 import pandas as pd
 from pathlib import Path
