@@ -38,15 +38,25 @@ set OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 請將所有欲分析的 Excel 檔案放入預設資料夾（如 `20250430產品出貨SPC/`）。
 
-### 3.1 批次轉換全部 Excel
+### 3.1 批次轉換全部 Excel（單次執行）
 
 ```bash
-python edge_etl/etl_to_json.py
+python -m edge_etl.etl_to_json
 # 或
-python edge_etl/etl_to_json.py --batch <批次關鍵字>
+python -m edge_etl.etl_to_json --batch <批次關鍵字>
 ```
 
-> 轉換後資料會自動存入 `mcp_server/json_cache/` 供 MCP-server 讀取加速查詢
+### 3.2 持續監控資料夾，自動轉換新檔案（建議於正式環境）
+
+```bash
+python -m edge_etl.etl_to_json --watch --interval 120
+```
+
+- `--watch`：啟用持續監控模式，程式會每隔 interval 秒自動偵測新 Excel 檔案並轉換。
+- `--interval`：設定每次掃描間隔秒數（預設 300 秒，建議 60~300 秒依需求調整）。
+
+> 轉換後資料會自動存入 `mcp_server/json_cache/` 供 MCP-server 讀取加速查詢。
+> 若無新檔案，程式會自動等待下次掃描，不會中斷。
 
 ---
 

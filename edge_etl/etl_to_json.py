@@ -8,10 +8,11 @@ from pathlib import Path
 import pandas as pd
 import argparse
 from datetime import datetime
+import time
 
 # 讀取設定
 DEFAULT_SRC = setting.DATA_SRC
-DEFAULT_DST = setting.DATA_CACHE
+DEFAULT_DST = setting.JSON_CACHE
 
 def safe_str(x):
     if pd.isna(x):
@@ -147,25 +148,57 @@ def etl_inspection_excel(excel_path: Path):
         "features": features,
         "etl_log": {"status": "success", "msg": ""}
     }
-def main():
-    parser = argparse.ArgumentParser(description="最嚴謹ETL Excel→JSON for MCP")
-    parser.add_argument("--src", type=str, default=DEFAULT_SRC, help="來源 Excel 資料夾")
-    parser.add_argument("--dst", type=str, default=DEFAULT_DST, help="輸出 JSON 快取資料夾")
-    args = parser.parse_args()
-    src_dir = Path(args.src)
-    dst_dir = Path(args.dst)
-    dst_dir.mkdir(parents=True, exist_ok=True)
-    files = list(src_dir.glob("*.xlsx"))
+
+def batch_etl(src_dir, dst_dir):
+    src = Path(src_dir)
+    dst = Path(dst_dir)
+    dst.mkdir(parents=True, exist_ok=True)
+    files = list(src.glob("*.xlsx"))
     print(f"共偵測到 {len(files)} 筆 Excel 檔案，開始ETL...")
     for file in files:
         try:
             result = etl_inspection_excel(file)
-            out_path = dst_dir / f"{result['meta']['machine_id']}.json"
+            out_path = dst / f"{result['meta']['machine_id']}.json"
             with open(out_path, "w", encoding="utf-8") as f:
                 json.dump(nan_to_none(result), f, ensure_ascii=False, indent=2)
             print(f"檔案 {file.name} → {out_path.name} 產生成功")
         except Exception as e:
             print(f"處理 {file.name} 失敗: {e}")
+
+def watch_etl(src_dir, dst_dir, interval=300):
+    src = Path(src_dir)
+    dst = Path(dst_dir)
+    dst.mkdir(parents=True, exist_ok=True)
+    已處理 = set(f.stem for f in dst.glob("*.json"))
+    print(f"進入監控模式，每 {interval} 秒自動同步 Excel → JSON")
+    while True:
+        filelist = list(src.glob("*.xlsx"))
+        新檔案 = [f for f in filelist if f.stem not in 已處理]
+        if 新檔案:
+            print(f"偵測到 {len(新檔案)} 筆新檔案，執行ETL...")
+        for file in 新檔案:
+            try:
+                result = etl_inspection_excel(file)
+                out_path = dst / f"{result['meta']['machine_id']}.json"
+                with open(out_path, "w", encoding="utf-8") as f:
+                    json.dump(nan_to_none(result), f, ensure_ascii=False, indent=2)
+                print(f"檔案 {file.name} → {out_path.name} 產生成功")
+                已處理.add(file.stem)
+            except Exception as e:
+                print(f"處理 {file.name} 失敗: {e}")
+        time.sleep(interval)
+
+def main():
+    parser = argparse.ArgumentParser(description="最嚴謹ETL Excel→JSON for MCP")
+    parser.add_argument("--src", type=str, default=DEFAULT_SRC, help="來源 Excel 資料夾")
+    parser.add_argument("--dst", type=str, default=DEFAULT_DST, help="輸出 JSON 快取資料夾")
+    parser.add_argument("--watch", action="store_true", help="持續監控模式")
+    parser.add_argument("--interval", type=int, default=300, help="監控間隔秒數 (預設300秒)")
+    args = parser.parse_args()
+    if args.watch:
+        watch_etl(args.src, args.dst, args.interval)
+    else:
+        batch_etl(args.src, args.dst)
 
 if __name__ == "__main__":
     main()
