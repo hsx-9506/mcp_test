@@ -1,48 +1,50 @@
-import requests
+import os
+import re
 import json
-import sys
+import requests
+from openai import OpenAI
 from pathlib import Path
-import config.setting as setting
-from typing import Dict, Any
+from dotenv import load_dotenv
+from typing import Dict, Any, List
 import argparse
+import config.setting as setting
+from config.prompts import SYSTEM_PROMPT, USER_PROMPT_TEMPLATE
 
-# ──────────────────────────────────────
-# 載入 LLM 回覆模板
-def load_intent_config(intent_name, config_path=None):
-    if config_path is None:
-        config_path = setting.INTENT_CONFIG
-    with open(config_path, "r", encoding="utf-8") as f:
-        intents = json.load(f)
-    return intents.get(intent_name, None)
+load_dotenv()
+# ────────────── 語意拆解與自動 tool_call ──────────────
+def extract_json(text: str) -> str:
+    """
+    從 LLM 回覆中擷取 JSON 區塊，若無則回傳原文
+    """
+    match = re.search(r"```(?:json)?\\s*(\\{[\\s\\S]*?\\})\\s*```", text)
+    if match:
+        return match.group(1)
+    return text
 
-# ──────────────────────────────────────
-# 取得使用者輸入的參數值
-def get_arg_value(arg_name, user_input_dict):
-    return user_input_dict.get(arg_name, "")
-
-# ──────────────────────────────────────
-# 呼叫 MCP server 取得工具結果
-def call_server(tool, args):
-    url_map = {
-        "batch_anomaly": setting.BATCH_ANOMALY_URL,
-        "spc_summary": setting.SPC_SUMMARY_URL,
-        "production_summary": setting.PRODUCTION_SUMMARY_URL,
-        "downtime_summary": setting.DOWNTIME_SUMMARY_URL,
-        "yield_summary": setting.YIELD_SUMMARY_URL,
-        "anomaly_trend": setting.ANOMALY_TREND_URL,
-        "KPI_summary": setting.KPI_SUMMARY_URL,
-        "issue_tracker": setting.ISSUE_TRACKER_URL
-    }
-    url = url_map.get(tool)
-    if not url:
-        return {"status": "ERROR", "data": f"Tool {tool} not supported"}
-    payload = {
-        "trace_id": f"trace-{tool}",
-        "tool": tool,
-        "args": args
-    }
+def decompose_query(user_input: str) -> dict:
+    """
+    語意拆解主流程，回傳 LLM 拆解後的 intent/tool_calls 結構
+    """
+    user_prompt = USER_PROMPT_TEMPLATE.format(user_input=user_input)
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_prompt}
+    ]
+    response_text = call_llm(messages)
+    json_part = extract_json(response_text)
     try:
-        resp = requests.post(url, json=payload, timeout=10)
+        result = json.loads(json_part)
+    except json.JSONDecodeError:
+        raise ValueError("❌ 無法解析 LLM 回應：", response_text)
+    return result
+
+# ──────────────────────────────────────
+# 統一呼叫 unified_server 查詢
+def call_server(tool, args):
+    params = {"type": tool}
+    params.update(args)
+    try:
+        resp = requests.get(setting.UNIFIED_SERVER_URL, params=params, timeout=10)
         resp.raise_for_status()
         return resp.json()
     except Exception as e:
@@ -200,33 +202,91 @@ def summarize_batch_context(batch_id, tool_results: Dict[str, str]):
     return summary
 
 # ──────────────────────────────────────
-# 呼叫 LLM 生成建議
-def call_llm(prompt, system_msg, api_key=None, model="gpt-4"):
-    import openai
-    api_key = api_key or setting.OPENAI_API_KEY
-    client = openai.OpenAI(api_key=api_key)
+# 主流程：將查詢轉換為 LLM 回覆
+def run_agent(query, batch_ids=None, extra_dict=None):
+    """
+    將主流程包裝成函式，供 UI 或其他程式直接呼叫。
+    :param query: 使用者查詢字串
+    :param batch_ids: 批次ID list，預設自動抓全部
+    :param extra_dict: 其他查詢參數 dict
+    :return: LLM 回覆字串
+    """
+    if batch_ids is None:
+        cache_dir = Path(setting.JSON_CACHE)
+        batch_ids = [f.stem for f in cache_dir.glob("*.json")]
+        batch_ids.sort()
+    if extra_dict is None:
+        extra_dict = {}
+    decomp = decompose_query(query)
+    tool_calls = decomp.get("tool_calls", [])
+    all_batch_summaries = []
+    for batch_id in batch_ids:
+        user_input_dict = {"batch_id": batch_id}
+        user_input_dict.update(extra_dict)
+        tool_results = {}
+        for call in tool_calls:
+            tool = call["tool"]
+            args_dict = {arg: user_input_dict.get(arg, "") for arg in call["args"]}
+            tool_result = call_server(tool, args_dict)
+            tool_results[tool] = summarize_tool_result(tool, tool_result)
+        all_batch_summaries.append(summarize_batch_context(batch_id, tool_results))
+    prompt = "下方為多個批次的重點摘要：\n"
+    for batch_summary in all_batch_summaries:
+        prompt += batch_summary
+    prompt += "\n請依據上述所有批次資訊，歸納各批次的品質問題、是否需現場改善，並提出總體檢討/改善建議。"
+    prompt += "\n直接用清單與段落條列式回答，不要加任何裝飾用符號。"
+    system_msg = "你是產線專家，請根據資料產生專業建議。"
     messages = [
         {"role": "system", "content": system_msg},
         {"role": "user", "content": prompt}
     ]
+    llm_reply = call_llm(messages)
+    return llm_reply
+
+# ──────────────────────────────────────
+# 呼叫 LLM 生成建議
+def call_llm(
+    messages: list,
+    model: str = "gpt-4o",
+    api_key: str = None,
+    temperature: float = 0.0
+) -> str:
+    """
+    統一的 OpenAI LLM 呼叫介面
+    :param messages: [{"role": "system", "content": ...}, {"role": "user", "content": ...}]
+    :param model: 預設 gpt-4o
+    :param api_key: 可選，預設用 OPENAI_API_KEY
+    :param temperature: 溫度參數
+    :return: LLM 回覆文字
+    """
+    api_key = setting.OPENAI_API_KEY
+    client = OpenAI(api_key=api_key)
     try:
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            temperature=0.2
+            temperature=temperature,
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
         return f"[LLM呼叫失敗] {str(e)}"
 
-# ──────────────────────────────────────
-# 主程式入口
+# ========= 主要流程 =========
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch", help="批次ID，多個用逗號分隔。不指定則自動抓全部。")
-    parser.add_argument("--intent", default="查詢批次異常", help="意圖名稱")
     parser.add_argument("--extra", nargs="*", help="其他參數，如 date=2024-05-28")
+    parser.add_argument("--decompose", action="store_true", help="僅進行語意分類與 tool_call 拆解")
     args = parser.parse_args()
+
+    if args.decompose:
+        query = input("請輸入要分析的問題：")
+        result = decompose_query(query)
+        print("\n✅ 語意分類：", result.get("intent"))
+        print("🧩 tool_calls 拆解：")
+        for i, call in enumerate(result.get("tool_calls", []), 1):
+            print(f"  {i}. {call}")
+        exit(0)
 
     # 取得所有批次ID
     if args.batch:
@@ -244,21 +304,20 @@ if __name__ == "__main__":
                 k, v = item.split("=", 1)
                 extra_dict[k] = v
 
-    # 載入意圖配置
-    intent = load_intent_config(args.intent)
-    if not intent:
-        print(f"[錯誤] 找不到 intent: {args.intent}")
-        exit(1)
+    # 讓使用者輸入自然語言查詢
+    query = input("請輸入查詢需求：")
+    decomp = decompose_query(query)
+    tool_calls = decomp.get("tool_calls", [])
+    intent = decomp.get("intent", "")
 
-    # 檢查必要的工具呼叫
     all_batch_summaries = []
     for batch_id in batch_ids:
         user_input_dict = {"batch_id": batch_id}
         user_input_dict.update(extra_dict)
         tool_results = {}
-        for call in intent["tool_calls"]:
+        for call in tool_calls:
             tool = call["tool"]
-            args_dict = {arg: get_arg_value(arg, user_input_dict) for arg in call["args"]}
+            args_dict = {arg: user_input_dict.get(arg, "") for arg in call["args"]}
             tool_result = call_server(tool, args_dict)
             tool_results[tool] = summarize_tool_result(tool, tool_result)
         all_batch_summaries.append(summarize_batch_context(batch_id, tool_results))
@@ -269,7 +328,11 @@ if __name__ == "__main__":
         prompt += batch_summary
     prompt += "\n請依據上述所有批次資訊，歸納各批次的品質問題、是否需現場改善，並提出總體檢討/改善建議。"
 
-    system_msg = intent.get("system_message", "你是產線專家，請根據資料產生專業建議。")
+    system_msg = "你是產線專家，請根據資料產生專業建議。"
     print("=== 傳送給 LLM 的 prompt ===\n", prompt)
-    llm_reply = call_llm(prompt, system_msg)
+    messages = [
+        {"role": "system", "content": system_msg},
+        {"role": "user", "content": prompt}
+    ]
+    llm_reply = call_llm(messages)
     print("=== LLM 回覆 ===\n", llm_reply)
