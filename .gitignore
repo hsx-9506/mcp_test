@@ -6,3 +6,5 @@ __pycache__
 config/settings.json
 S
 video.py
+main.py
+openai_client.py
