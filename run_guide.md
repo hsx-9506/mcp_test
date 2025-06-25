@@ -1,6 +1,6 @@
 # MCP+LLM 智慧製造異常分析快速操作指南
 
-> 本指南說明如何從資料前處理（ETL）、啟動 MCP 多工具服務，到 LLM 智慧整合異常分析的整個操作步驟與指令。
+> 本指南說明如何從資料前處理（ETL）、啟動 unified_server 到 LLM 智慧整合異常分析的整個操作步驟與指令。
 
 ---
 
@@ -55,34 +55,27 @@ python -m edge_etl.etl_to_json --watch --interval 120
 - `--watch`：啟用持續監控模式，程式會每隔 interval 秒自動偵測新 Excel 檔案並轉換。
 - `--interval`：設定每次掃描間隔秒數（預設 300 秒，建議 60~300 秒依需求調整）。
 
-> 轉換後資料會自動存入 `mcp_server/json_cache/` 供 MCP-server 讀取加速查詢。
+> 轉換後資料會自動存入 `mcp_server/json_cache/` 供 unified_server 讀取加速查詢。
 > 若無新檔案，程式會自動等待下次掃描，不會中斷。
 
 ---
 
-## 4. 啟動 MCP-server 多工具服務
+## 4. 啟動 unified_server（統合型 MCP 查詢服務）
 
-請分別於多個命令視窗啟動下列服務（可依需求選擇）：
+只需啟動 unified_server 即可，所有查詢、異常、統計、分群、分頁、動態欄位等功能皆由此統一處理。
 
 ```bash
-uvicorn mcp_server.batch_anomaly_server:app --host 0.0.0.0 --port 8001
-uvicorn mcp_server.spc_summary_server:app --host 0.0.0.0 --port 8002
-uvicorn mcp_server.production_summary_server:app --host 0.0.0.0 --port 8003
-uvicorn mcp_server.downtime_summary_server:app --host 0.0.0.0 --port 8004
-uvicorn mcp_server.yield_summary_server:app --host 0.0.0.0 --port 8005
-uvicorn mcp_server.anomaly_trend_server:app --host 0.0.0.0 --port 8006
-uvicorn mcp_server.KPI_summary_server:app --host 0.0.0.0 --port 8007
-uvicorn mcp_server.issue_tracker_server:app --host 0.0.0.0 --port 8008
+python mcp_server/unified_server.py
 ```
 
-> 每個服務預設會從 `mcp_server/json_cache/` 讀取資料。  
+> 預設會從 `mcp_server/json_cache/` 讀取資料。
 > 若需變更 port 或資料來源，請修改 `config/settings.json` 或 `config/setting.py`。
 
 ---
 
 ## 5. 啟動 LLM 多工具 Agent 整合查詢
 
-此步驟將由 LLM 進行語意拆解、發出多個 tool_call，整合所有 MCP-server 回覆並輸出建議。
+此步驟將由 LLM 進行語意拆解、發出多個 tool_call，整合 unified_server 回覆並輸出建議。
 
 - 處理全部批次：
   ```bash
@@ -92,20 +85,30 @@ uvicorn mcp_server.issue_tracker_server:app --host 0.0.0.0 --port 8008
   ```bash
   python -m agent_client.llm_agent --batch 02,03,05
   ```
-- 指定意圖（如有多種 intent）：
+- CLI 測試語意拆解（可選）：
   ```bash
-  python -m agent_client.llm_agent --intent 查詢批次異常
+  python agent_client/llm_agent.py --decompose
   ```
 
 ---
 
-## 6. 查看 LLM 分析回覆
+## 6. 啟動圖形化查詢介面（UI）
 
-LLM agent 執行結束後，終端機將自動輸出異常原因、SPC 結果、與建議。
+```bash
+python ui.py
+```
+
+UI 介面支援查詢流程可視化、每階段狀態與摘要顯示。
 
 ---
 
-## 7. 進階/常見問題
+## 7. 查看 LLM 分析回覆
+
+LLM agent 執行結束後，終端機或 UI 會自動輸出異常原因、SPC 結果、與建議。
+
+---
+
+## 8. 進階/常見問題
 
 * **如果出現「找不到檔案」或「JSON 不存在」錯誤：**
   * 請先確認已執行 `etl_to_json.py` 做前處理。
@@ -114,7 +117,7 @@ LLM agent 執行結束後，終端機將自動輸出異常原因、SPC 結果、
   * 檢查 `OPENAI_API_KEY` 是否設定正確。
 
 * **出現 404/500 或 port 佔用：**
-  * 檢查 server 是否成功啟動，且無其他程式佔用對應 port。
+  * 檢查 unified_server 是否成功啟動，且無其他程式佔用對應 port。
 
 * **欲更換資料來源/Excel 路徑：**
   * 修改 `config/settings.json` 或主程式中 `DATA_DIR` 參數。
