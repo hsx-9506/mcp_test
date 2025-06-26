@@ -5,8 +5,3 @@ mcp_server/json_cache
 __pycache__
 config/settings.json
 S
-video.py
-main.py
-openai_client.py
-mock_data\all_server_full_mock_data.json
-mock_data\gen_all_server_full_mock_data.py
