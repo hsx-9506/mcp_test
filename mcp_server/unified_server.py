@@ -5,7 +5,8 @@ from fastapi.responses import JSONResponse
 from collections import defaultdict
 from config.setting import MOCK_DATA_PATH, CPK_PPK_THRESHOLD
 
-app = FastAPI()
+app = FastAPI(title="Summary Server",
+              description="提供各類生產數據的查詢和統計功能")
 
 # 載入 mock data
 with open(MOCK_DATA_PATH, 'r', encoding='utf-8') as f:
