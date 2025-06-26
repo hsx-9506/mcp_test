@@ -65,7 +65,7 @@ python -m edge_etl.etl_to_json --watch --interval 120
 只需啟動 unified_server 即可，所有查詢、異常、統計、分群、分頁、動態欄位等功能皆由此統一處理。
 
 ```bash
-python mcp_server/unified_server.py
+uvicorn mcp_server.unified_server:app --host 0.0.0.0 --port 8000
 ```
 
 > 預設會從 `mcp_server/json_cache/` 讀取資料。
