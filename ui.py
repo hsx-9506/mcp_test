@@ -5,77 +5,90 @@ import time
 import json
 import sys
 import os
-sys.path.append(os.path.dirname(__file__))
+
 from agent_client import llm_agent
+
+sys.path.append(os.path.dirname(__file__))
 
 class MCPDemoUI(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("MCP ↔ LLM 智能查詢介面")
-        self.geometry("1100x750")
-        self.minsize(800, 500)
+        self.geometry("1280x820")
+        self.minsize(950, 680)
         self.configure(bg="#f5f6fa")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
 
         # 左側流程條
-        self.left = tk.Frame(self, width=260, bg="#f5f6fa", highlightthickness=0, bd=0)
-        self.left.grid(row=0, column=0, sticky="ns", padx=(18,0), pady=18)
-        self.left.grid_propagate(False)
-        self.left.pack_propagate(False)
+        self.left = tk.Frame(self, width=225, bg="#f5f6fa")
+        self.left.pack(side=tk.LEFT, fill=tk.Y, padx=(16, 0), pady=18)
         self.steps = []
         self.step_labels = [
-            "語意分析/子問題拆解", "agent 發送 tool_call", "server 回傳 tool_result",
+            "語意分析", "子問題拆解", "agent 發送 tool_call", "server 回傳 tool_result",
             "agent 處理/組裝", "LLM 回覆"
         ]
         for step in self.step_labels:
-            lbl = tk.Label(self.left, text=f"🟢 {step}", font=("Microsoft JhengHei", 14, "bold"), anchor="w", pady=16, bg="#f5f6fa")
-            lbl.pack(fill=tk.X, pady=2)
+            lbl = tk.Label(self.left, text=f"🟢 {step}", font=("Microsoft JhengHei", 13, "bold"), anchor="w", pady=12, bg="#f5f6fa")
+            lbl.pack(fill=tk.X, pady=1)
             self.steps.append(lbl)
 
-        # 右側：Console+對話框
-        self.right = tk.Frame(self, bg="#f5f6fa")
-        self.right.grid(row=0, column=1, sticky="nsew", padx=(10,18), pady=10)
-        self.right.grid_rowconfigure(1, weight=1)
-        self.right.grid_columnconfigure(0, weight=1)
-        frm = tk.Frame(self.right, bg="#f5f6fa")
-        frm.grid(row=0, column=0, sticky="ew", pady=6)
-        frm.grid_columnconfigure(1, weight=1)
-        tk.Label(frm, text="請輸入查詢需求：", font=("Microsoft JhengHei", 13), bg="#f5f6fa").grid(row=0, column=0, sticky="w")
-        self.input_box = tk.Entry(frm, width=60, font=("Microsoft JhengHei", 13))
-        self.input_box.grid(row=0, column=1, sticky="ew", padx=4)
-        tk.Button(frm, text="送出查詢", font=("Microsoft JhengHei", 12, "bold"), bg="#4f8cff", fg="white", command=self.start_flow_thread).grid(row=0, column=2, padx=10)
-        tk.Button(frm, text="清除紀錄", font=("Microsoft JhengHei", 11), command=self.clear_console, bg="#e0e0e0").grid(row=0, column=3)
+        # 右側：上半部-分欄、下半部-console
+        frm_right = tk.Frame(self, bg="#fafdff")
+        frm_right.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # Console顯示區
-        self.console = ScrolledText(self.right, font=("Consolas", 12), height=38, wrap=tk.WORD, bg="#fafdff", highlightthickness=0, bd=0)
-        self.console.grid(row=1, column=0, sticky="nsew", pady=6)
+        # 頂部查詢區
+        frm_top = tk.Frame(frm_right, bg="#f5f6fa")
+        frm_top.pack(fill=tk.X, pady=(8,6), padx=16)
+        tk.Label(frm_top, text="請輸入查詢需求：", font=("Microsoft JhengHei", 13), bg="#f5f6fa").pack(side=tk.LEFT)
+        self.input_box = tk.Entry(frm_top, width=65, font=("Microsoft JhengHei", 13))
+        self.input_box.pack(side=tk.LEFT, padx=4, expand=True, fill=tk.X)
+        tk.Button(frm_top, text="送出查詢", font=("Microsoft JhengHei", 12, "bold"), bg="#4f8cff", fg="white", command=self.start_flow_thread).pack(side=tk.LEFT, padx=8)
+        tk.Button(frm_top, text="清除紀錄", font=("Microsoft JhengHei", 11), command=self.clear_console, bg="#e0e0e0").pack(side=tk.LEFT)
 
-        self.update_idletasks()
-        self.after(100, self.fix_layout)
+        # 分欄顯示區
+        frm_middle = tk.Frame(frm_right, bg="#e9f1fb")
+        frm_middle.pack(fill=tk.X, padx=16, pady=(2, 0))
+        self.left_box = tk.Text(frm_middle, width=45, height=10, font=("Microsoft JhengHei", 13), bg="#f8fcff", wrap=tk.WORD)
+        self.right_box = tk.Text(frm_middle, width=55, height=10, font=("Microsoft JhengHei", 13), bg="#fff8fa", wrap=tk.WORD)
+        self.left_box.pack(side=tk.LEFT, padx=(0,6), pady=3, fill=tk.BOTH, expand=True)
+        self.right_box.pack(side=tk.LEFT, padx=(6,0), pady=3, fill=tk.BOTH, expand=True)
+        self.left_box.insert(tk.END, "【語意分析】\n")
+        self.right_box.insert(tk.END, "【子問題/Tool Call 拆解】\n")
+        self.left_box.config(state=tk.DISABLED)
+        self.right_box.config(state=tk.DISABLED)
 
-    def fix_layout(self):
-        # 強制左側寬度固定，避免因自動調整導致抖動
-        self.left.config(width=260)
-        self.left.update_idletasks()
-        self.right.update_idletasks()
-        self.update_idletasks()
+        # 下方 log console（設只讀）
+        self.console = ScrolledText(frm_right, font=("Consolas", 12), height=28, wrap=tk.WORD, bg="#fafdff", highlightthickness=0, bd=0)
+        self.console.pack(fill=tk.BOTH, expand=True, padx=16, pady=(6,18))
+        self.console.config(state=tk.DISABLED)
 
-    def set_step(self, idx, status="on"):
+    def set_step(self, idx):
         for i, lbl in enumerate(self.steps):
             if i < idx:
-                lbl.config(text=f"✅ {lbl.cget('text')[2:]}", fg="#2ecc71")
+                lbl.config(text=f"✅ {self.step_labels[i]}", fg="#2ecc71")
             elif i == idx:
-                lbl.config(text=f"🔆 {lbl.cget('text')[2:]}", fg="#f39c12")
+                lbl.config(text=f"🔆 {self.step_labels[i]}", fg="#f39c12")
             else:
-                lbl.config(text=f"🟢 {lbl.cget('text')[2:]}", fg="#b2bec3")
+                lbl.config(text=f"🟢 {self.step_labels[i]}", fg="#b2bec3")
 
     def log(self, msg):
+        self.console.config(state=tk.NORMAL)
         self.console.insert(tk.END, msg + "\n")
         self.console.see(tk.END)
+        self.console.config(state=tk.DISABLED)
 
     def clear_console(self):
+        self.console.config(state=tk.NORMAL)
         self.console.delete(1.0, tk.END)
+        self.console.config(state=tk.DISABLED)
+        self.left_box.config(state=tk.NORMAL)
+        self.right_box.config(state=tk.NORMAL)
+        self.left_box.delete(1.0, tk.END)
+        self.right_box.delete(1.0, tk.END)
+        self.left_box.insert(tk.END, "【語意分析】\n")
+        self.right_box.insert(tk.END, "【子問題/Tool Call 拆解】\n")
+        self.left_box.config(state=tk.DISABLED)
+        self.right_box.config(state=tk.DISABLED)
+        self.set_step(0)
 
     def start_flow_thread(self):
         threading.Thread(target=self.run_flow, daemon=True).start()
@@ -85,57 +98,102 @@ class MCPDemoUI(tk.Tk):
         if not user_q:
             self.log("[請輸入查詢需求]")
             return
-        self.set_step(0)
-        self.log(f"[語意分析] 問題：{user_q}")
-        time.sleep(0.3)
         try:
-            # 語意分析與子問題拆解
+            # === 0. 語意分析 ===
+            self.set_step(0)
+            self.left_box.config(state=tk.NORMAL)
+            self.left_box.delete(1.0, tk.END)
+            self.left_box.insert(tk.END, "【語意分析】\n")
+            self.left_box.config(state=tk.DISABLED)
+            self.right_box.config(state=tk.NORMAL)
+            self.right_box.delete(1.0, tk.END)
+            self.right_box.insert(tk.END, "【子問題/Tool Call 拆解】\n")
+            self.right_box.config(state=tk.DISABLED)
+            self.log(f"[語意分析] 問題：{user_q}")
+
             decomp = llm_agent.decompose_query(user_q)
             intent = decomp.get("intent")
-            subtasks = decomp.get("subtasks") or decomp.get("tool_calls")
-            self.log(f"[語意分析] intent: {intent}")
-            self.log("[子問題/Tool Call 拆解]：")
-            if subtasks:
-                for i, sub in enumerate(subtasks, 1):
-                    self.log(f"  {i}. {sub}")
-            else:
-                self.log("  無法拆解子任務/Tool Call")
-            # ===== 2. agent 發送 tool_call =====
+            reasoning = decomp.get("reasoning", "")
+            keywords = decomp.get("keywords", [])
+            self.left_box.config(state=tk.NORMAL)
+            self.left_box.insert(tk.END, f"Intent: {intent}\n")
+            if reasoning:
+                self.left_box.insert(tk.END, f"Reasoning: {reasoning}\n")
+            if keywords:
+                self.left_box.insert(tk.END, f"關鍵字: {','.join(keywords)}\n")
+            self.left_box.config(state=tk.DISABLED)
+            time.sleep(0.3)
+
+            # === 1. 子問題/Tool Call 拆解 ===
             self.set_step(1)
+            self.right_box.config(state=tk.NORMAL)
+            tool_calls = decomp.get("tool_calls") or decomp.get("subtasks") or []
+            self.right_box.delete(1.0, tk.END)
+            self.right_box.insert(tk.END, "【子問題/Tool Call 拆解】\n")
+            if tool_calls:
+                for i, sub in enumerate(tool_calls, 1):
+                    if isinstance(sub, dict):
+                        tool = sub.get("tool", "")
+                        args = sub.get("args", {})
+                        line = f"{i}. {tool}  參數: {json.dumps(args, ensure_ascii=False)}\n"
+                        self.right_box.insert(tk.END, line)
+                    else:
+                        self.right_box.insert(tk.END, f"{i}. {sub}\n")
+            else:
+                self.right_box.insert(tk.END, "無法拆解子任務/Tool Call\n")
+            self.right_box.config(state=tk.DISABLED)
+            time.sleep(0.3)
+
+            # ===== 2. agent 發送 tool_call =====
+            self.set_step(2)
             self.log("[agent] 自動發送 tool_call...")
             tool_results = {}
-            if subtasks:
-                for i, call in enumerate(subtasks, 1):
-                    tool = call["tool"] if isinstance(call, dict) and "tool" in call else str(call)
-                    args = call.get("args", {}) if isinstance(call, dict) else {}
+            if tool_calls:
+                for i, call in enumerate(tool_calls, 1):
+                    if isinstance(call, dict):
+                        tool = call.get("tool", "")
+                        args = call.get("args", {}) or {}
+                    else:
+                        tool = str(call)
+                        args = {}
                     self.log(f"[Tool Call {i}] 已發送（工具：{tool}，參數：{list(args.keys()) if args else '無'}) ...")
                     tool_result = llm_agent.call_server(tool, args)
                     tool_results[tool] = tool_result
-                    self.set_step(2)
-                    # 只顯示回傳狀態與資料筆數，不顯示全部內容
+                    self.set_step(3)
                     status = tool_result.get('status', 'UNKNOWN')
                     data = tool_result.get('data', [])
                     count = len(data) if isinstance(data, list) else (1 if data else 0)
                     self.log(f"[Server 回傳 {tool}] 狀態：{status}，資料筆數：{count}")
                     time.sleep(0.3)
             else:
-                self.set_step(2)
+                self.set_step(3)
                 self.log("[server] 無 tool_call 可發送")
+
             # ===== 3. agent 處理/組裝 =====
-            self.set_step(3)
+            self.set_step(4)
             self.log("[agent] 處理/組裝摘要...")
             summary = []
             for tool, result in tool_results.items():
                 summary_str = llm_agent.summarize_tool_result(tool, result)
-                # 只顯示前50字，避免太長
-                short_summary = summary_str[:50].replace('\n', ' ') + ("..." if len(summary_str) > 50 else "")
-                self.log(f"[摘要] {tool}：{short_summary}")
+                # ↓↓↓ 美化摘要多行縮排
+                self.log(f"\n[摘要] {tool}：")
+                for line in summary_str.splitlines():
+                    if line.strip():
+                        self.log(f"  {line}")
+                    else:
+                        self.log("")
                 summary.append(summary_str)
+
             # ===== 4. LLM 回覆 =====
-            self.set_step(4)
-            self.log("[LLM] 統整回覆中...")
+            self.set_step(5)
+            self.log("\n[LLM 回覆]")
             reply = llm_agent.run_agent(user_q)
-            self.log(f"[LLM 回覆] {reply}")
+            for line in reply.splitlines():
+                if line.strip():
+                    self.log(f"  {line}")
+                else:
+                    self.log("")
+            self.set_step(len(self.step_labels))
         except Exception as e:
             self.log(f"[錯誤] {e}")
 
