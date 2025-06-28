@@ -1,58 +1,50 @@
-{
-  "查詢產能達成": {
-    "tool_calls": [
-      {"tool": "production_summary", "args": ["date"]}
-    ],
-    "prompt_template": "以下是{date}的產能達成摘要：\n{production_summary}\n請指出哪些產線/班別未達標，分析可能原因並提出建議。",
-    "system_message": "你是資深產線主管，請條列說明各產線產能未達標的原因與改善建議。"
+[
+  {
+    "intent": "查詢良率",
+    "keywords": ["良率", "良品率", "報廢率", "yield"],
+    "tool_call": ["yield_summary"],
+    "prompt_template": "請根據以下良率彙總，列出所有異常批次與異常原因及指標，並針對品質問題給出改善建議。\n資料：{summary}"
   },
-
-  "查詢停機彙總": {
-    "tool_calls": [
-      {"tool": "downtime_summary", "args": ["date"]}
-    ],
-    "prompt_template": "以下是{date}的產線停機彙總：\n{downtime_summary}\n請分析停機主因、TOP機台，並提出改善建議。",
-    "system_message": "你是現場效率專家，請針對停機主因與主要機台提出專業建議。"
+  {
+    "intent": "產能查詢",
+    "keywords": ["產能", "今天的產能", "生產進度", "產量"],
+    "tool_call": ["production_summary"],
+    "prompt_template": "根據本日生產產能彙總，請指出進度異常、產能落後或達標的批次，並對異常批次給出改善建議。\n資料：{summary}"
   },
-
-  "查詢良率彙總": {
-    "tool_calls": [
-      {"tool": "yield_summary", "args": ["date"]}
-    ],
-    "prompt_template": "以下是{date}的產品良率紀錄：\n{yield_summary}\n請針對不良品較多的產品或班別提出改善建議。",
-    "system_message": "你是製程分析顧問，請聚焦良率異常批次與可能原因。"
+  {
+  "intent": "異常總覽",
+  "keywords": ["異常", "異常總覽", "批次異常", "異常分類"],
+  "tool_call": ["batch_anomaly", "spc_summary"],
+  "prompt_template": "請結合批次異常資料與SPC異常指標，逐批說明主要異常原因、嚴重程度，以及提出具體改善建議。\n批次異常：{batch_anomaly}\nSPC異常：{spc_summary}"
   },
-
-  "查詢異常趨勢": {
-    "tool_calls": [
-      {"tool": "anomaly_trend", "args": ["date"]}
-    ],
-    "prompt_template": "這是{date}以來的產線異常事件時序紀錄：\n{anomaly_trend}\n請分析近期異常是否有上升趨勢，並預警潛在問題。",
-    "system_message": "你是製造品質預警專家，請條列異常頻發時段與趨勢走向。"
+  {
+    "intent": "異常趨勢分析",
+    "keywords": ["異常趨勢", "趨勢", "異常變化", "異常時間序列"],
+    "tool_call": ["anomaly_trend"],
+    "prompt_template": "請針對異常趨勢時間序列資料，說明近期異常增加的工序或批次，並推測可能原因與後續建議。\n資料：{summary}"
   },
-
-  "查詢KPI報表": {
-    "tool_calls": [
-      {"tool": "KPI_summary", "args": ["date"]}
-    ],
-    "prompt_template": "以下是{date}的多維KPI報表：\n{KPI_summary}\n請聚焦說明哪些指標偏低，並建議優先改善的方向。",
-    "system_message": "你是企業績效分析師，請條列各KPI異常重點。"
+  {
+    "intent": "停機原因查詢",
+    "keywords": ["停機", "停機時間", "停機原因", "downtime"],
+    "tool_call": ["downtime_summary"],
+    "prompt_template": "根據停機紀錄，列出主要停機原因及其影響批次與時段，針對關鍵停機給出預防和改善建議。\n資料：{summary}"
   },
-
-  "查詢工單進度": {
-    "tool_calls": [
-      {"tool": "issue_tracker", "args": ["date"]}
-    ],
-    "prompt_template": "這是{date}的工單/異常單處理狀態：\n{issue_tracker}\n請聚焦列出未結案或進度落後工單，並建議追蹤重點。",
-    "system_message": "你是維修管理專家，請聚焦未結案工單狀況。"
+  {
+    "intent": "OEE與KPI查詢",
+    "keywords": ["OEE", "KPI", "稼動率", "不良率", "關鍵績效"],
+    "tool_call": ["KPI_summary"],
+    "prompt_template": "請根據OEE與KPI數據，評估生產效能並標註異常區段，對不達標指標提出提升方案。\n資料：{summary}"
   },
-
-  "查詢批次異常": {
-    "tool_calls": [
-      {"tool": "batch_anomaly", "args": ["batch_id"]},
-      {"tool": "spc_summary", "args": ["batch_id"]}
-    ],
-    "prompt_template": "下方是批次「{batch_id}」的異常統計與 SPC summary：\n---\n異常摘要：\n{batch_anomaly}\n---\nSPC 製程能力分析：\n{spc_summary}\n---\n請依據上述資訊，判斷品質問題及建議改善方向。",
-    "system_message": "你是資深製造品質管理顧問，請用條列分析上述資料。"
+  {
+    "intent": "品檢紀錄查詢",
+    "keywords": ["品檢", "量測紀錄", "inspection", "品管記錄"],
+    "tool_call": ["inspection_record"],
+    "prompt_template": "逐條品檢記錄中，請指出不合格品與對應規格、建議復檢或改進流程。\n資料：{summary}"
+  },
+  {
+    "intent": "問題追蹤",
+    "keywords": ["問題追蹤", "issue", "追蹤紀錄", "異常單"],
+    "tool_call": ["issue_tracker"],
+    "prompt_template": "根據問題追蹤紀錄，請摘要尚未解決的異常單，標註處理進度，並針對未完成項目提出優先級建議。\n資料：{summary}"
   }
-}
+]

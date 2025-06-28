@@ -1,5 +1,4 @@
 # prompts.py
-
 SYSTEM_PROMPT = """
 You are a semantic agent in a smart manufacturing context. 
 Your job is to analyze the user's query, infer the real intention, and map it to **one or more of the following MCP flag types** (see below).
@@ -35,3 +34,32 @@ USER_PROMPT_TEMPLATE = """
 
 ---請直接回覆 JSON  Please output pure JSON only, without any markdown code block.---
 """
+
+import json
+from pathlib import Path
+
+def load_intents(path=None):
+    """載入intents.json"""
+    if path is None:
+        # 預設從專案根目錄下 intent_config/intents.json
+        path = str(Path(__file__).parent.parent / "intent_config" / "intents.json")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+def build_llm_intent_doc(intents):
+    """將intents內容自動產生給LLM看的描述字串"""
+    lines = []
+    for it in intents:
+        line = (
+            f"intent: {it['intent']}\n"
+            f"tool_call: {', '.join(it['tool_call'])}\n"
+            f"keywords: {', '.join(it['keywords'])}\n"
+            f"description: {it.get('description','')}\n"
+        )
+        lines.append(line)
+    return "\n".join(lines)
+
+# 載入一次所有intents，供agent同步用
+INTENTS = load_intents()
+LLM_INTENT_DOC = build_llm_intent_doc(INTENTS)
+
