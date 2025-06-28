@@ -25,6 +25,14 @@ TYPE_FIELDS = {
     'anomaly_trend': ['batch_id', 'date', 'machine_id', 'line', 'event_type', 'abnormal_code', 'count', 'anomaly_remark'],
     'KPI_summary': ['batch_id', 'kpi_name', 'value', 'target', 'kpi_achieve_rate'],
     'issue_tracker': ['batch_id', 'issue_id', 'status', 'owner', 'created_at', 'closed_at', 'description'],
+    # 新增最關鍵欄位 ↓↓↓
+    'batch_anomaly': [
+        'batch_id', 'product', 'machine_id', 'date', 'abnormal_count', 'abnormal_features',
+        'main_reason', 'anomaly_remark', 'spc_items', 'ng_qty', 'good_qty'
+    ],
+    'spc_summary': [
+        'batch_id', 'product', 'machine_id', 'date', 'spc_items'
+    ]
 }
 
 def is_abnormal(row):
