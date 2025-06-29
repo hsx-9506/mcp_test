@@ -1,0 +1,1567 @@
+[
+  {
+    "batch_id": "B1000",
+    "machine_id": "M01",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-18",
+    "target_qty": 1000,
+    "actual_qty": 955,
+    "achieve_rate": 95.5,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 951,
+    "ng_qty": 4,
+    "yield_percent": 99.58,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.58,
+    "target": 98,
+    "kpi_achieve_rate": 99.58,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-18",
+    "closed_at": "2025-06-18",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2382,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2377,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2375,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2407,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2397,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.6,
+        "ppk": 1.32,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1001",
+    "machine_id": "M01",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-06-19",
+    "target_qty": 1000,
+    "actual_qty": 972,
+    "achieve_rate": 97.2,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 964,
+    "ng_qty": 8,
+    "yield_percent": 99.18,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.18,
+    "target": 98,
+    "kpi_achieve_rate": 99.18,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-19",
+    "closed_at": "2025-06-19",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.24,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2398,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2406,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2405,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2391,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.52,
+        "ppk": 1.44,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1002",
+    "machine_id": "M01",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-06-20",
+    "target_qty": 1000,
+    "actual_qty": 1000,
+    "achieve_rate": 100.0,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 994,
+    "ng_qty": 6,
+    "yield_percent": 99.4,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.4,
+    "target": 98,
+    "kpi_achieve_rate": 99.4,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-20",
+    "closed_at": "2025-06-20",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2387,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2378,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2418,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2387,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2375,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.35,
+        "ppk": 1.72,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1003",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-21",
+    "target_qty": 1000,
+    "actual_qty": 959,
+    "achieve_rate": 95.9,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 952,
+    "ng_qty": 7,
+    "yield_percent": 99.27,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.27,
+    "target": 98,
+    "kpi_achieve_rate": 99.27,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-21",
+    "closed_at": "2025-06-21",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2397,
+            "timestamp": "2025-06-21",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2419,
+            "timestamp": "2025-06-21",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2389,
+            "timestamp": "2025-06-21",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2398,
+            "timestamp": "2025-06-21",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2411,
+            "timestamp": "2025-06-21",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.61,
+        "ppk": 1.73,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1004",
+    "machine_id": "M01",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-22",
+    "target_qty": 1000,
+    "actual_qty": 996,
+    "achieve_rate": 99.6,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 995,
+    "ng_qty": 1,
+    "yield_percent": 99.9,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.9,
+    "target": 98,
+    "kpi_achieve_rate": 99.9,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-22",
+    "closed_at": "2025-06-22",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2372,
+            "timestamp": "2025-06-22",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2381,
+            "timestamp": "2025-06-22",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2384,
+            "timestamp": "2025-06-22",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2374,
+            "timestamp": "2025-06-22",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2382,
+            "timestamp": "2025-06-22",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.35,
+        "ppk": 1.44,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1005",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-23",
+    "target_qty": 1000,
+    "actual_qty": 965,
+    "achieve_rate": 96.5,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 960,
+    "ng_qty": 5,
+    "yield_percent": 99.48,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.48,
+    "target": 98,
+    "kpi_achieve_rate": 99.48,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-23",
+    "closed_at": "2025-06-23",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2388,
+            "timestamp": "2025-06-23",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2404,
+            "timestamp": "2025-06-23",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2405,
+            "timestamp": "2025-06-23",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2404,
+            "timestamp": "2025-06-23",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2374,
+            "timestamp": "2025-06-23",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.62,
+        "ppk": 1.57,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1006",
+    "machine_id": "M01",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-06-24",
+    "target_qty": 1000,
+    "actual_qty": 985,
+    "achieve_rate": 98.5,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 979,
+    "ng_qty": 6,
+    "yield_percent": 99.39,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.39,
+    "target": 98,
+    "kpi_achieve_rate": 99.39,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-24",
+    "closed_at": "2025-06-24",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2383,
+            "timestamp": "2025-06-24",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2416,
+            "timestamp": "2025-06-24",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2404,
+            "timestamp": "2025-06-24",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2381,
+            "timestamp": "2025-06-24",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2386,
+            "timestamp": "2025-06-24",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.68,
+        "ppk": 1.33,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1007",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-06-25",
+    "target_qty": 1000,
+    "actual_qty": 979,
+    "achieve_rate": 97.9,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 975,
+    "ng_qty": 4,
+    "yield_percent": 99.59,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.59,
+    "target": 98,
+    "kpi_achieve_rate": 99.59,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-25",
+    "closed_at": "2025-06-25",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2373,
+            "timestamp": "2025-06-25",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2416,
+            "timestamp": "2025-06-25",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2398,
+            "timestamp": "2025-06-25",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2406,
+            "timestamp": "2025-06-25",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2381,
+            "timestamp": "2025-06-25",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.55,
+        "ppk": 1.74,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1008",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-26",
+    "target_qty": 1000,
+    "actual_qty": 963,
+    "achieve_rate": 96.3,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 959,
+    "ng_qty": 4,
+    "yield_percent": 99.58,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.58,
+    "target": 98,
+    "kpi_achieve_rate": 99.58,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-26",
+    "closed_at": "2025-06-26",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2377,
+            "timestamp": "2025-06-26",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2407,
+            "timestamp": "2025-06-26",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2397,
+            "timestamp": "2025-06-26",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2407,
+            "timestamp": "2025-06-26",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2391,
+            "timestamp": "2025-06-26",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.59,
+        "ppk": 1.48,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1009",
+    "machine_id": "M03",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-06-27",
+    "target_qty": 1000,
+    "actual_qty": 982,
+    "achieve_rate": 98.2,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 981,
+    "ng_qty": 1,
+    "yield_percent": 99.9,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.9,
+    "target": 98,
+    "kpi_achieve_rate": 99.9,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-27",
+    "closed_at": "2025-06-27",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2408,
+            "timestamp": "2025-06-27",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2413,
+            "timestamp": "2025-06-27",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2378,
+            "timestamp": "2025-06-27",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2378,
+            "timestamp": "2025-06-27",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2404,
+            "timestamp": "2025-06-27",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.6,
+        "ppk": 1.49,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1010",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-28",
+    "target_qty": 1000,
+    "actual_qty": 987,
+    "achieve_rate": 98.7,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 983,
+    "ng_qty": 4,
+    "yield_percent": 99.59,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.59,
+    "target": 98,
+    "kpi_achieve_rate": 99.59,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-28",
+    "closed_at": "2025-06-28",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2419,
+            "timestamp": "2025-06-28",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2413,
+            "timestamp": "2025-06-28",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2371,
+            "timestamp": "2025-06-28",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2406,
+            "timestamp": "2025-06-28",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2404,
+            "timestamp": "2025-06-28",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.57,
+        "ppk": 1.43,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1011",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-06-29",
+    "target_qty": 1000,
+    "actual_qty": 961,
+    "achieve_rate": 96.1,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 957,
+    "ng_qty": 4,
+    "yield_percent": 99.58,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.58,
+    "target": 98,
+    "kpi_achieve_rate": 99.58,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-29",
+    "closed_at": "2025-06-29",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2392,
+            "timestamp": "2025-06-29",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2393,
+            "timestamp": "2025-06-29",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2418,
+            "timestamp": "2025-06-29",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2414,
+            "timestamp": "2025-06-29",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2383,
+            "timestamp": "2025-06-29",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.55,
+        "ppk": 1.39,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1012",
+    "machine_id": "M03",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-06-30",
+    "target_qty": 1000,
+    "actual_qty": 979,
+    "achieve_rate": 97.9,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 969,
+    "ng_qty": 10,
+    "yield_percent": 98.98,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 98.98,
+    "target": 98,
+    "kpi_achieve_rate": 98.98,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-06-30",
+    "closed_at": "2025-06-30",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2395,
+            "timestamp": "2025-06-30",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.238,
+            "timestamp": "2025-06-30",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2389,
+            "timestamp": "2025-06-30",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2378,
+            "timestamp": "2025-06-30",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2418,
+            "timestamp": "2025-06-30",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.76,
+        "ppk": 1.76,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1013",
+    "machine_id": "M02",
+    "line": "A",
+    "shift": "早班",
+    "product": "P3",
+    "date": "2025-07-01",
+    "target_qty": 1000,
+    "actual_qty": 981,
+    "achieve_rate": 98.1,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 981,
+    "ng_qty": 0,
+    "yield_percent": 100.0,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 100.0,
+    "target": 98,
+    "kpi_achieve_rate": 100.0,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-07-01",
+    "closed_at": "2025-07-01",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2376,
+            "timestamp": "2025-07-01",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2388,
+            "timestamp": "2025-07-01",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2419,
+            "timestamp": "2025-07-01",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.241,
+            "timestamp": "2025-07-01",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2382,
+            "timestamp": "2025-07-01",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.42,
+        "ppk": 1.58,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "B1014",
+    "machine_id": "M01",
+    "line": "A",
+    "shift": "早班",
+    "product": "P1",
+    "date": "2025-07-02",
+    "target_qty": 1000,
+    "actual_qty": 1003,
+    "achieve_rate": 100.3,
+    "event_count": 0,
+    "total_minutes": 0,
+    "main_reason": "",
+    "remark": "",
+    "good_qty": 996,
+    "ng_qty": 7,
+    "yield_percent": 99.3,
+    "event_type": "",
+    "abnormal_code": "",
+    "count": 0,
+    "anomaly_remark": "",
+    "kpi_name": "良率",
+    "value": 99.3,
+    "target": 98,
+    "kpi_achieve_rate": 99.3,
+    "issue_id": "",
+    "status": "closed",
+    "owner": "",
+    "created_at": "2025-07-02",
+    "closed_at": "2025-07-02",
+    "description": "",
+    "abnormal_count": 0,
+    "abnormal_features": [],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.2411,
+            "timestamp": "2025-07-02",
+            "out_of_spec": false
+          },
+          {
+            "seq": 2,
+            "value": 0.2419,
+            "timestamp": "2025-07-02",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.2397,
+            "timestamp": "2025-07-02",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.2376,
+            "timestamp": "2025-07-02",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.2403,
+            "timestamp": "2025-07-02",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.77,
+        "ppk": 1.38,
+        "cpk_alert": false,
+        "cpk_reason": "",
+        "ppk_alert": false,
+        "ppk_reason": "",
+        "abnormal_detail": []
+      }
+    ]
+  },
+  {
+    "batch_id": "X9000",
+    "machine_id": "M03",
+    "line": "B",
+    "shift": "夜班",
+    "product": "P2",
+    "date": "2025-06-18",
+    "target_qty": 1000,
+    "actual_qty": 900,
+    "achieve_rate": 90.0,
+    "event_count": 2,
+    "total_minutes": 35,
+    "main_reason": "原料異常",
+    "remark": "原料規格不符導致多項尺寸超規",
+    "good_qty": 800,
+    "ng_qty": 100,
+    "yield_percent": 88.89,
+    "event_type": "異常停機",
+    "abnormal_code": "E99",
+    "count": 1,
+    "anomaly_remark": "原料規格不符導致多項尺寸超規",
+    "kpi_name": "良率",
+    "value": 88.89,
+    "target": 98,
+    "kpi_achieve_rate": 88.89,
+    "issue_id": "ISSUE9000",
+    "status": "open",
+    "owner": "王小明",
+    "created_at": "2025-06-18",
+    "closed_at": "",
+    "description": "原料規格不符導致多項尺寸超規",
+    "abnormal_count": 1,
+    "abnormal_features": [
+      {
+        "feature_name": "規格標準",
+        "cpk": 0.85,
+        "cpk_alert": true,
+        "cpk_reason": "Cpk過低 (原料異常)",
+        "ppk": 0.8,
+        "ppk_alert": true,
+        "ppk_reason": "Ppk過低 (原料異常)",
+        "abnormal_detail": [
+          0.245,
+          0.246,
+          0.246
+        ]
+      }
+    ],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.245,
+            "timestamp": "2025-06-18",
+            "out_of_spec": true
+          },
+          {
+            "seq": 2,
+            "value": 0.246,
+            "timestamp": "2025-06-18",
+            "out_of_spec": true
+          },
+          {
+            "seq": 3,
+            "value": 0.239,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.241,
+            "timestamp": "2025-06-18",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.246,
+            "timestamp": "2025-06-18",
+            "out_of_spec": true
+          }
+        ],
+        "cpk": 0.85,
+        "ppk": 0.8,
+        "cpk_alert": true,
+        "cpk_reason": "Cpk過低 (原料異常)",
+        "ppk_alert": true,
+        "ppk_reason": "Ppk過低 (原料異常)",
+        "abnormal_detail": [
+          0.245,
+          0.246,
+          0.246
+        ]
+      }
+    ]
+  },
+  {
+    "batch_id": "X9001",
+    "machine_id": "M03",
+    "line": "B",
+    "shift": "夜班",
+    "product": "P2",
+    "date": "2025-06-19",
+    "target_qty": 1000,
+    "actual_qty": 930,
+    "achieve_rate": 93.0,
+    "event_count": 2,
+    "total_minutes": 35,
+    "main_reason": "設備異常",
+    "remark": "設備震動導致良率下滑",
+    "good_qty": 870,
+    "ng_qty": 60,
+    "yield_percent": 93.55,
+    "event_type": "異常停機",
+    "abnormal_code": "E99",
+    "count": 1,
+    "anomaly_remark": "設備震動導致良率下滑",
+    "kpi_name": "良率",
+    "value": 93.55,
+    "target": 98,
+    "kpi_achieve_rate": 93.55,
+    "issue_id": "ISSUE9001",
+    "status": "open",
+    "owner": "王小明",
+    "created_at": "2025-06-19",
+    "closed_at": "",
+    "description": "設備震動導致良率下滑",
+    "abnormal_count": 1,
+    "abnormal_features": [
+      {
+        "feature_name": "規格標準",
+        "cpk": 1.0,
+        "cpk_alert": true,
+        "cpk_reason": "Cpk過低 (設備異常)",
+        "ppk": 0.95,
+        "ppk_alert": true,
+        "ppk_reason": "Ppk過低 (設備異常)",
+        "abnormal_detail": [
+          0.235,
+          0.236
+        ]
+      }
+    ],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.235,
+            "timestamp": "2025-06-19",
+            "out_of_spec": true
+          },
+          {
+            "seq": 2,
+            "value": 0.237,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.236,
+            "timestamp": "2025-06-19",
+            "out_of_spec": true
+          },
+          {
+            "seq": 4,
+            "value": 0.238,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          },
+          {
+            "seq": 5,
+            "value": 0.239,
+            "timestamp": "2025-06-19",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 1.0,
+        "ppk": 0.95,
+        "cpk_alert": true,
+        "cpk_reason": "Cpk過低 (設備異常)",
+        "ppk_alert": true,
+        "ppk_reason": "Ppk過低 (設備異常)",
+        "abnormal_detail": [
+          0.235,
+          0.236
+        ]
+      }
+    ]
+  },
+  {
+    "batch_id": "X9002",
+    "machine_id": "M03",
+    "line": "B",
+    "shift": "夜班",
+    "product": "P2",
+    "date": "2025-06-20",
+    "target_qty": 1000,
+    "actual_qty": 960,
+    "achieve_rate": 96.0,
+    "event_count": 2,
+    "total_minutes": 35,
+    "main_reason": "人員誤操作",
+    "remark": "操作失誤造成規格偏移",
+    "good_qty": 920,
+    "ng_qty": 40,
+    "yield_percent": 95.83,
+    "event_type": "異常停機",
+    "abnormal_code": "E99",
+    "count": 1,
+    "anomaly_remark": "操作失誤造成規格偏移",
+    "kpi_name": "良率",
+    "value": 95.83,
+    "target": 98,
+    "kpi_achieve_rate": 95.83,
+    "issue_id": "ISSUE9002",
+    "status": "open",
+    "owner": "王小明",
+    "created_at": "2025-06-20",
+    "closed_at": "",
+    "description": "操作失誤造成規格偏移",
+    "abnormal_count": 1,
+    "abnormal_features": [
+      {
+        "feature_name": "規格標準",
+        "cpk": 0.92,
+        "cpk_alert": true,
+        "cpk_reason": "Cpk過低 (人員誤操作)",
+        "ppk": 0.9,
+        "ppk_alert": true,
+        "ppk_reason": "Ppk過低 (人員誤操作)",
+        "abnormal_detail": [
+          0.236,
+          0.243
+        ]
+      }
+    ],
+    "total_spc_items": 1,
+    "spc_items": [
+      {
+        "feature_name": "規格標準",
+        "spec": 0.2395,
+        "usl": 0.243,
+        "lsl": 0.236,
+        "unit": "inch",
+        "sample_size": 5,
+        "measurements": [
+          {
+            "seq": 1,
+            "value": 0.236,
+            "timestamp": "2025-06-20",
+            "out_of_spec": true
+          },
+          {
+            "seq": 2,
+            "value": 0.237,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          },
+          {
+            "seq": 3,
+            "value": 0.24,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          },
+          {
+            "seq": 4,
+            "value": 0.243,
+            "timestamp": "2025-06-20",
+            "out_of_spec": true
+          },
+          {
+            "seq": 5,
+            "value": 0.241,
+            "timestamp": "2025-06-20",
+            "out_of_spec": false
+          }
+        ],
+        "cpk": 0.92,
+        "ppk": 0.9,
+        "cpk_alert": true,
+        "cpk_reason": "Cpk過低 (人員誤操作)",
+        "ppk_alert": true,
+        "ppk_reason": "Ppk過低 (人員誤操作)",
+        "abnormal_detail": [
+          0.236,
+          0.243
+        ]
+      }
+    ]
+  }
+]

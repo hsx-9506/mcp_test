@@ -1,7 +1,7 @@
 import openai
 import os
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+from config.setting import OPENAI_API_KEY
 
 def review_data(data_json: dict, task_type="data_check") -> dict:
     """
@@ -19,16 +19,16 @@ def review_data(data_json: dict, task_type="data_check") -> dict:
 資料如下：
 {data_json}
 """
-    resp = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # 可用 mini-LM 或本地輕量模型
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    resp = client.chat.completions.create(
+        model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "你是嚴謹的製造品質數據審查員。"},
+            {"role": "system", "content": "你是生產數據審查員。"},
             {"role": "user", "content": prompt}
         ],
         temperature=0,
         max_tokens=300
     )
-    # 回傳審查意見
     review = resp.choices[0].message.content
     # 解析 review 結果（可用正則/簡單字串判斷）
     result = {
@@ -55,10 +55,11 @@ def review_answer(user_question, mcp_tool_results, llm_reply) -> dict:
 資料摘要：{mcp_tool_results}
 模型回答：{llm_reply}
 """
-    resp = openai.ChatCompletion.create(
+    client = openai.OpenAI(api_key=OPENAI_API_KEY)
+    resp = client.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "你是生產數據決策審查員。"},
+            {"role": "system", "content": "你是生產數據審查員。"},
             {"role": "user", "content": prompt}
         ],
         temperature=0,

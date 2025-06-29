@@ -3,7 +3,7 @@ from openai import OpenAI
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import Dict
-from reviewer_agent import review_answer
+from agent_client.reviewer_agent import review_answer
 
 from config.setting import OPENAI_API_KEY, JSON_CACHE, UNIFIED_SERVER_URL
 from config.prompts import (
@@ -305,6 +305,7 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
         summary_list.append(f"【{tool} 摘要】\n{summary_str}\n")
     current_summary = "\n".join(summary_list)
     step_outputs[4] = current_summary if current_summary else "(無摘要)"
+    summary_section = step_outputs[4] if len(step_outputs) > 4 else ""
 
     # 6. LLM回覆
     user_intent = user_query.strip()
@@ -344,30 +345,47 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
     messages_final.append({"role": "user", "content": final_prompt})
     llm_reply = call_llm(messages_final)
 
-    # -------- 雙向回授機制開始 --------
-    reviewer_result = review_answer(user_query, current_summary, llm_reply)
+    # 7. 雙向回授
     max_round = 3
     round_cnt = 0
+    last_valid_llm_reply = llm_reply
+
+    reviewer_result = review_answer(user_query, summary_section, llm_reply)
     while not reviewer_result.get("answer_ok", True) and round_cnt < max_round:
-        # 自動補充 reviewer 的建議，要求 LLM 修正
+        print(f"\n[REVIEW回合{round_cnt+1}] reviewer_result: {reviewer_result}")
+        print(f"[REVIEW回合{round_cnt+1}] llm_reply:\n{llm_reply}")
+        # 用 reviewer 給的 missing 指令要求 LLM 補強
         missing_text = reviewer_result.get("missing", "請補充缺失內容")
         revise_prompt = (
             "審查員建議如下，請依指示補強你的回覆（只需補充不足，不要重複整段）：\n"
             f"{missing_text}\n"
             "-----\n"
             f"【原始回答】\n{llm_reply}\n"
-            f"【查詢摘要】\n{current_summary}\n"
+            f"【查詢摘要】\n{summary_section}\n"
         )
         llm_reply = call_llm([
             {"role": "system", "content": sys_prompt},
             {"role": "user", "content": revise_prompt}
         ])
-        reviewer_result = review_answer(user_query, current_summary, llm_reply)
+        last_valid_llm_reply = llm_reply
+        reviewer_result = review_answer(user_query, summary_section, llm_reply)
         round_cnt += 1
-    # -------- 雙向回授機制結束 --------
 
-    # 將 LLM 回覆與摘要加入 step_outputs
-    step_outputs[5] = llm_reply
+    print(f"\n[REVIEW最終] reviewer_result: {reviewer_result}")
+    print(f"[REVIEW最終] llm_reply:\n{llm_reply}\n")
+
+    # 若最後一輪回覆只有「本輪已無新異常/建議」或「查無內容」等，回退上一輪
+    ending_flags = [
+        "本輪已無新異常/建議。",
+        "【原始回答補充】\n本輪已無新異常/建議。\n\n【查詢摘要補充】\n無。",
+        "查無異常資料"
+    ]
+    if llm_reply.strip() in ending_flags:
+        final_reply = last_valid_llm_reply
+    else:
+        final_reply = llm_reply
+
+    step_outputs[5] = final_reply
 
     # === 新增：無論return_summary為True或False，都可回傳三件事 ===
     if return_summary:
@@ -378,7 +396,7 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
 def run_agent(user_query, session_history=None, return_summary=False):
     result = run_agent_smart(user_query, session_history=session_history, return_summary=True)
     if return_summary:
-        return result  # (step_outputs, reply, summary_section)
+        return result
     else:
         return result[1]  # 只回傳 reply
 
