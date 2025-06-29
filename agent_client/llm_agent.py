@@ -3,6 +3,7 @@ from openai import OpenAI
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import Dict
+from reviewer_agent import review_answer
 
 from config.setting import OPENAI_API_KEY, JSON_CACHE, UNIFIED_SERVER_URL
 from config.prompts import (
@@ -342,6 +343,30 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
     messages_final.append({"role": "system", "content": sys_prompt})
     messages_final.append({"role": "user", "content": final_prompt})
     llm_reply = call_llm(messages_final)
+
+    # -------- 雙向回授機制開始 --------
+    reviewer_result = review_answer(user_query, current_summary, llm_reply)
+    max_round = 3
+    round_cnt = 0
+    while not reviewer_result.get("answer_ok", True) and round_cnt < max_round:
+        # 自動補充 reviewer 的建議，要求 LLM 修正
+        missing_text = reviewer_result.get("missing", "請補充缺失內容")
+        revise_prompt = (
+            "審查員建議如下，請依指示補強你的回覆（只需補充不足，不要重複整段）：\n"
+            f"{missing_text}\n"
+            "-----\n"
+            f"【原始回答】\n{llm_reply}\n"
+            f"【查詢摘要】\n{current_summary}\n"
+        )
+        llm_reply = call_llm([
+            {"role": "system", "content": sys_prompt},
+            {"role": "user", "content": revise_prompt}
+        ])
+        reviewer_result = review_answer(user_query, current_summary, llm_reply)
+        round_cnt += 1
+    # -------- 雙向回授機制結束 --------
+
+    # 將 LLM 回覆與摘要加入 step_outputs
     step_outputs[5] = llm_reply
 
     # === 新增：無論return_summary為True或False，都可回傳三件事 ===
