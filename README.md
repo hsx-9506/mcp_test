@@ -12,6 +12,7 @@ MCP_TEST
 │
 ├─ agent_client/                  # LLM Agent 端（主流程）
 │   └─ llm_agent.py
+│   └─ reviewer_agent.py
 │
 ├─ config/                        # 設定/共用設定模組
 │   ├─ __init__.py
@@ -51,19 +52,22 @@ MCP_TEST
      - 可由 CLI、UI 或其他程式直接呼叫。
 
 4. **圖形化查詢介面**
-   - `ui.py`：Tkinter UI，支援查詢流程可視化、每階段狀態與摘要顯示。
+   - `ui.py`：提供一個互動式的聊天介面，讓使用者能以自然語言進行查詢。
+   - **即時流程追蹤**：左側面板會以燈號（🟢🔵⚪）即時顯示 Agent 的執行進度，從語意分析到最終回覆，一目了然。
+   - **詳細步驟檢視**：可展開側邊欄，查看每個步驟的詳細輸入與輸出內容（如 `tool_calls`、`server` 回傳的 JSON），方便開發與除錯。
+   - **對話式體驗**：查詢與回覆以聊天氣泡呈現，並提供一鍵複製回覆、清除歷史紀錄等便利功能。
 
 ## 重要檔案說明
 
 - `edge_etl/etl_to_json.py`：資料前處理（ETL），將 Excel 轉換成 JSON。
 - `agent_client/llm_agent.py`：主 agent，語意拆解、tool_call、查詢 unified_server、摘要與 LLM 回饋。
+- `agent_client/reviewer_agent.py`：負責將 LLM 回覆進行審閱與潤飾，確保內容的準確性與可讀性。
 - `config/setting.py, settings.json`：全域參數設定，含 unified_server 位置、API KEY 等。
 - `mcp_server/unified_server.py`：統合型 MCP server，所有查詢/異常/統計/分群/分頁/動態欄位等功能。
 - `mock_data/all_server_full_mock_data.json`：全功能 mock data。
-- `ui.py`：Tkinter 圖形化查詢介面。
+- `ui.py`：Tkinter 圖形化查詢介面，整合了 `llm_agent` 的所有功能，提供聊天、即時流程追蹤、詳細步驟檢視與歷史紀錄管理等功能。
 
 ## 操作說明
-
 詳細安裝、啟動、查詢與開發流程請參考 [run_guide.md](run_guide.md)。
 
 ## 特色與擴充
