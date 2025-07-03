@@ -3,10 +3,10 @@ from openai import OpenAI
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import Dict
-from agent_client.reviewer_agent import review_answer
+from collections import Counter # 引入 Counter
 
+from agent_client.reviewer_agent import review_answer
 from config.setting import OPENAI_API_KEY, JSON_CACHE, UNIFIED_SERVER_URL
-# (1) ===== 更新 import 語句 =====
 from config.prompts import (
     SYSTEM_PROMPT, DECOMPOSER_SYSTEM_PROMPT, USER_PROMPT_TEMPLATE,
     load_intents, build_llm_intent_doc
@@ -75,75 +75,52 @@ def call_server(tool, args, retry=2):
 def summarize_tool_result(tool, tool_result):
     status = tool_result.get("status", "").lower()
     data = tool_result.get("data", [])
+    title = f"### {tool}\n"
 
-    # === 異常總覽：條列化每個批次 ===
     if tool == "batch_anomaly":
-        # print("[DEBUG] batch_anomaly data:", json.dumps(data, ensure_ascii=False, indent=2))
-        if not data:
-            return "無異常批次"
-        abnormal_batches = []
+        if not data: return title + "無符合條件的異常批次。"
+        content = []
         for item in data:
             if item.get("abnormal_count", 0) > 0 or item.get("abnormal_features"):
+                # 【修改點】: 增加換行和縮排，讓格式更清晰
                 lines = [
-                    f"- 批次ID：{item.get('batch_id', '')}",
-                    f"- 產品：{item.get('product', item.get('product_name', ''))}",
-                    f"- 異常數：{item.get('abnormal_count', '')}",
-                    f"- 異常主因：{item.get('main_reason', '') or item.get('anomaly_remark', '') or '未標註'}",
+                    f"- **批次ID**：{item.get('batch_id', 'N/A')}",
+                    f"  - **產品**：{item.get('product', 'N/A')}",
+                    f"  - **異常主因**：{item.get('main_reason') or item.get('anomaly_remark') or '未標註'}",
                 ]
-                # 條列特性
                 for f in item.get("abnormal_features", []):
-                    feature_lines = [f"  - 特性：{f.get('feature_name', '')}"]
-                    if f.get('cpk_alert'):
-                        feature_lines.append(f"    - Cpk={f.get('cpk', '')} [警告:{f.get('cpk_reason', '')}]")
-                    if f.get('ppk_alert'):
-                        feature_lines.append(f"    - Ppk={f.get('ppk', '')} [警告:{f.get('ppk_reason', '')}]")
-                    if f.get("abnormal_detail"):
-                        feature_lines.append(f"    - 明細: {', '.join(map(str, f['abnormal_detail']))}")
-                    lines.extend(feature_lines)
-                abnormal_batches.append("\n".join(lines))
-        if not abnormal_batches:
-            return "查無異常批次"
-        return "\n\n".join(abnormal_batches)
+                    lines.append(f"  - **特性**：{f.get('feature_name', '')}")
+                    if f.get('cpk_alert'): lines.append(f"    - **Cpk**={f.get('cpk', ''):.2f} [警告:{f.get('cpk_reason', '')}]")
+                    if f.get('ppk_alert'): lines.append(f"    - **Ppk**={f.get('ppk', ''):.2f} [警告:{f.get('ppk_reason', '')}]")
+                content.append("\n".join(lines))
+        return title + ("\n".join(content) if content else "查無異常批次。")
 
-    # === 異常趨勢：條列化每筆異常 ===
     if tool == "anomaly_trend":
-        if not data:
-            return "本區間無異常趨勢"
-        lines = []
-        for item in data:
-            count = item.get('count', 0)
-            try:
-                count_num = int(count)
-            except Exception:
-                count_num = 0
-            if count_num > 0:
-                lines.append(
-                    f"- 日期：{item.get('date', '')}\n"
-                    f"  - 機台：{item.get('machine_id', '')}\n"
-                    f"  - 產線：{item.get('line', '')}\n"
-                    f"  - 異常類型：{item.get('event_type', '')}\n"
-                    f"  - 異常代碼：{item.get('abnormal_code', '')}\n"
-                    f"  - 次數：{count}\n"
-                    f"  - 備註：{item.get('anomaly_remark', '')}"
-                )
-        if not lines:
-            return "本區間未發現異常趨勢"
-        return "\n\n".join(lines)
+        if not data: return title + "指定時間範圍內無歷史異常事件可供分析。"
+        cause_counts = Counter(item.get('anomaly_remark') for item in data if item.get('anomaly_remark'))
+        if not cause_counts: return title + "所有歷史異常事件均未標註主因，無法進行趨勢分析。"
+        lines = ["- **主要異常原因分佈**："]
+        for reason, count in cause_counts.most_common():
+            lines.append(f"  - 原因「{reason}」總共發生了 **{count}** 次。")
+        return title + "\n".join(lines)
 
-    # 其他 summary 保持原本格式（表格或純文字）
     if tool == "spc_summary":
-        if not data:
-            return "無 SPC 製程能力資料"
-        spc_lines = []
+        if not data: return title + "所有批次的 SPC 製程能力皆在正常範圍內。"
+        lines = ["偵測到以下批次存在 **SPC 製程能力警報**："]
+        found_alert = False
         for item in data:
+            batch_id = item.get('batch_id', '未知批次')
             for f in item.get("spc_items", []):
                 if f.get("cpk_alert") or f.get("ppk_alert"):
-                    spc_lines.append(
-                        f"批次:{item.get('batch_id','')}, 特性:{f.get('feature_name','')}, Cpk:{f.get('cpk','')}, Ppk:{f.get('ppk','')}, 警告:{f.get('cpk_reason','') or f.get('ppk_reason','')}"
-                    )
-        if not spc_lines:
-            return "所有批次SPC皆正常"
-        return "\n".join(spc_lines)
+                    found_alert = True
+                    feature_name = f.get('feature_name', '未知特性')
+                    cpk_val = f.get('cpk', 'N/A'); ppk_val = f.get('ppk', 'N/A')
+                    reason = f.get('cpk_reason') or f.get('ppk_reason') or '原因未標註'
+                    # 【修改點】: 增加換行和縮排
+                    lines.append(f"- **批次 {batch_id}** 的「{feature_name}」項目：")
+                    lines.append(f"  - **Cpk**: {cpk_val:.2f} [警告: {reason}]")
+                    lines.append(f"  - **Ppk**: {ppk_val:.2f} [警告: {reason}]")
+        return title + ("\n".join(lines) if found_alert else "所有批次的 SPC 製程能力皆在正常範圍內。")
 
     if tool == "production_summary":
         if not data:
@@ -338,13 +315,23 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
     step_outputs[4] = summary_section if summary_section else "(無摘要)"
     yield 4, step_outputs[4]
 
+    context_hint = ""
+    tool_names = {call.get('tool') for call in tool_calls}
+    if 'anomaly_trend' in tool_names:
+        context_hint = "（這是一次趨勢分析查詢）"
+    elif 'spc_summary' in tool_names or 'batch_anomaly' in tool_names:
+        context_hint = "（這是一次即時異常查詢）"
+    elif 'improvement_suggestion' in tool_names: # 假設未來有改善建議的工具
+        context_hint = "（這是關於改善建議的查詢）"
+
     # --- 步驟 6: LLM回覆 ---
     final_user_prompt = (
         f"這是本次查詢的相關資料：\n"
         f"---------------------\n"
         f"【工具查詢結果】\n{summary_section}\n"
         f"---------------------\n\n"
-        f"現在，請根據以上資料，並嚴格遵守你的系統指令，回答我最初的問題：\n"
+        # 將情境提示加入問題中
+        f"現在，請根據以上資料，並嚴格遵守你的系統指令，回答我最初的問題{context_hint}：\n"
         f"「{user_query}」"
     )
 

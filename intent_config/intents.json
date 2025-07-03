@@ -12,20 +12,24 @@
     "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
-    "intent": "異常總覽",
-    "keywords": ["異常", "異常狀況", "有什麼問題", "批次異常", "anomaly", "spc"],
-    "tool_call": [
-      "batch_anomaly",
-      "spc_summary"
-    ],
+    "intent": "即時異常查詢",
+    "keywords": ["異常", "異常狀況", "有什麼問題", "批次異常", "anomaly"],
+    "tool_call": [ "batch_anomaly" ],
+    "description": "查詢特定批次的整體異常狀況，包含主因、NG數等。",
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
+  },
+  {
+    "intent": "SPC警報查詢",
+    "keywords": ["spc", "cpk", "ppk", "製程能力", "管制圖"],
+    "tool_call": [ "spc_summary" ],
+    "description": "專門查詢 Cpk/Ppk 等製程能力指標的警報。",
     "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "異常趨勢分析",
     "keywords": ["趨勢", "異常趨勢", "變化", "trend", "走勢"],
-    "tool_call": [
-      "anomaly_trend"
-    ],
+    "tool_call": [ "anomaly_trend" ],
+    "description": "分析一段時間內的歷史異常事件，找出模式與規律。",
     "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
