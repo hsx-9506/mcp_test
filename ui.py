@@ -303,6 +303,10 @@ class MCPChatUI(tk.Tk):
         user_q = self.input_box.get().strip()
         if not user_q:
             return
+        
+        # (1) ===== 新增：將使用者問題加入歷史紀錄 =====
+        self.session_history.append({"role": "user", "content": user_q})
+        
         self.add_bubble(user_q, sender="user")
         self.input_box.delete(0, tk.END)
         
@@ -325,11 +329,8 @@ class MCPChatUI(tk.Tk):
             for result in agent:
                 if isinstance(result[0], int):
                     idx, content = result
-                    
-                    # 更新狀態變數，UI 輪詢會自動偵測到這個變化
                     self.step_outputs[idx] = content
                     self.current_step_index = idx 
-                        
                     time.sleep(0.07) 
                 elif result[0] == "done":
                     final_step_outputs, final_reply, final_summary_section = result[1]
@@ -337,6 +338,10 @@ class MCPChatUI(tk.Tk):
             self.step_outputs = final_step_outputs
             self.summary_text = final_summary_section
             
+            # (2) ===== 新增：將最終的 AI 回覆也加入歷史紀錄 =====
+            self.session_history.append({"role": "assistant", "content": final_reply})
+
+            # 清理回覆並顯示在畫面上
             llm_reply_cleaned = self._append_hint_if_needed(clean_llm_reply(final_reply))
             self.after(0, lambda: self.add_bubble(llm_reply_cleaned, sender="assistant"))
             self.after(0, self.update_summary, self.summary_text)
