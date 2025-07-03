@@ -3,48 +3,53 @@
     "intent": "查詢良率",
     "keywords": ["良率", "良品率", "報廢率", "yield"],
     "tool_call": ["yield_summary"],
-    "prompt_template": "請根據以下良率彙總，列出所有異常批次與異常原因及指標，並針對品質問題給出改善建議。\n資料：{summary}"
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "產能查詢",
     "keywords": ["產能", "今天的產能", "生產進度", "產量"],
     "tool_call": ["production_summary"],
-    "prompt_template": "根據本日生產產能彙總，請指出進度異常、產能落後或達標的批次，並對異常批次給出改善建議。\n資料：{summary}"
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
-  "intent": "異常總覽",
-  "keywords": ["異常", "異常總覽", "批次異常", "異常分類"],
-  "tool_call": ["batch_anomaly", "spc_summary"],
-  "prompt_template": "請結合批次異常資料與SPC異常指標，逐批說明主要異常原因、嚴重程度，以及提出具體改善建議。\n批次異常：{batch_anomaly}\nSPC異常：{spc_summary}"
+    "intent": "異常總覽",
+    "keywords": ["異常", "異常狀況", "有什麼問題", "批次異常", "anomaly", "spc"],
+    "tool_call": [
+      "batch_anomaly",
+      "spc_summary"
+    ],
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "異常趨勢分析",
-    "keywords": ["異常趨勢", "趨勢", "異常變化", "異常時間序列"],
-    "tool_call": ["anomaly_trend"],
-    "prompt_template": "請針對異常趨勢時間序列資料，說明近期異常增加的工序或批次，並推測可能原因與後續建議。\n資料：{summary}"
+    "keywords": ["趨勢", "異常趨勢", "變化", "trend", "走勢"],
+    "tool_call": [
+      "anomaly_trend"
+    ],
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "停機原因查詢",
     "keywords": ["停機", "停機時間", "停機原因", "downtime"],
     "tool_call": ["downtime_summary"],
-    "prompt_template": "根據停機紀錄，列出主要停機原因及其影響批次與時段，針對關鍵停機給出預防和改善建議。\n資料：{summary}"
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "OEE與KPI查詢",
     "keywords": ["OEE", "KPI", "稼動率", "不良率", "關鍵績效"],
     "tool_call": ["KPI_summary"],
-    "prompt_template": "請根據OEE與KPI數據，評估生產效能並標註異常區段，對不達標指標提出提升方案。\n資料：{summary}"
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "品檢紀錄查詢",
     "keywords": ["品檢", "量測紀錄", "inspection", "品管記錄"],
     "tool_call": ["inspection_record"],
-    "prompt_template": "逐條品檢記錄中，請指出不合格品與對應規格、建議復檢或改進流程。\n資料：{summary}"
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   },
   {
     "intent": "問題追蹤",
     "keywords": ["問題追蹤", "issue", "追蹤紀錄", "異常單"],
     "tool_call": ["issue_tracker"],
-    "prompt_template": "根據問題追蹤紀錄，請摘要尚未解決的異常單，標註處理進度，並針對未完成項目提出優先級建議。\n資料：{summary}"
+    "prompt_template": "請根據下方提供的【工具查詢結果】，為使用者進行全面且有條理的彙總。請嚴格遵循你的核心系統指令來組織回覆。"
   }
 ]
