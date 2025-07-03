@@ -57,9 +57,14 @@ class MCPChatUI(tk.Tk):
         self.configure(bg="#f6f8fb")
         self.session_history = []
         self.summary_records = []
-        self.step_outputs = [""] * 6  # 每個步驟詳細輸出
-        self.summary_text = ""        # 摘要內容
+        self.step_outputs = [""] * 6
+        self.summary_text = ""
         self.step_panel_visible = False
+
+        # === 新增狀態變數 ===
+        # -1: 待機/準備中, 0-5: 進行中, 6: 全部完成
+        # *** 修改點：將初始值從 6 改為 -1，讓初始燈號為灰色待機狀態 ***
+        self.current_step_index = -1  
 
         # ===== 左側步驟燈+按鈕(垂直區塊) =====
         self.left = tk.Frame(self, width=180, bg="#f5f6fa")
@@ -75,13 +80,18 @@ class MCPChatUI(tk.Tk):
                            anchor="w", pady=13, bg="#f5f6fa")
             lbl.pack(fill=tk.X, pady=0)
             self.step_labels.append(lbl)
+        
         # ===== 步驟內容顯示/收合按鈕(左下) =====
         self.list_btn = tk.Button(self.left, text="☰", font=("Arial", 20), bg="#f5f6fa", bd=0, 
                                   activebackground="white", command=self.toggle_step_panel)
         self.list_btn.pack(side=tk.BOTTOM, anchor="sw", pady=15, padx=10)
+        
         # 新增清除紀錄按鈕
         self.clear_btn = tk.Button(self.left, text="清除紀錄", font=("Microsoft JhengHei", 12, "bold"), bg="#4f8cff", fg="white", bd=0, activebackground="#fff0f0", command=self.clear_history)
         self.clear_btn.pack(side=tk.BOTTOM, anchor="sw", pady=(0,8), padx=10)
+
+        # === 啟動 UI 輪詢迴圈 ===
+        self.update_step_lights()
 
         # ===== 主內容框架 =====
         self.main_area = tk.Frame(self, bg="#fafdff")
@@ -103,15 +113,16 @@ class MCPChatUI(tk.Tk):
             self.chat_canvas.itemconfig(self.bubble_window, width=event.width)
         self.chat_canvas.bind("<Configure>", on_resize)
         self.bubble_frame.bind("<Configure>", lambda e: self.chat_canvas.configure(scrollregion=self.chat_canvas.bbox("all")))
-        self.chat_canvas.bind_all("<MouseWheel>", self._on_mousewheel)  # Windows
-        self.chat_canvas.bind_all("<Button-4>", self._on_mousewheel)    # Linux 上滾
-        self.chat_canvas.bind_all("<Button-5>", self._on_mousewheel)    # Linux 下滾
-        self.chat_canvas.bind_all("<Shift-MouseWheel>", self._on_mousewheel)  # 橫向
+        self.chat_canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.chat_canvas.bind("<Button-4>", self._on_mousewheel)
+        self.chat_canvas.bind("<Button-5>", self._on_mousewheel)
+        self.chat_canvas.bind("<Shift-MouseWheel>", self._on_mousewheel)
+        self.chat_canvas.bind_all("<Shift-MouseWheel>", self._on_mousewheel)
 
         # ===== 輸入區（永遠在聊天區正下方）=====
-        self.input_bg = tk.Frame(self.main_area, bg="#ededed")  # 淺灰色
+        self.input_bg = tk.Frame(self.main_area, bg="#ededed")
         self.input_bg.grid(row=1, column=0, sticky="ew")
-        self.input_area = tk.Frame(self.input_bg, bg="#ededed")  # 淺灰色
+        self.input_area = tk.Frame(self.input_bg, bg="#ededed")
         self.input_area.pack(padx=24, pady=11, fill=tk.X)
         self.input_box = tk.Entry(self.input_area, font=("Microsoft JhengHei", 13), relief="flat", bg="#fafdff",
                                   highlightbackground="#c9d6ef", highlightcolor="#6ca6fc", highlightthickness=2)
@@ -132,6 +143,9 @@ class MCPChatUI(tk.Tk):
         )
         self._panel_title.pack(fill=tk.X, padx=0, pady=(6,3))
         self.step_panel_widgets = []
+        self.bubble_frame.bind("<MouseWheel>", self._on_mousewheel)
+        self.bubble_frame.bind("<Button-4>", self._on_mousewheel)
+        self.bubble_frame.bind("<Button-5>", self._on_mousewheel)
 
         # ==== 初始提示 ====
         self.add_bubble("請在下方輸入您的查詢需求。", sender="assistant")
@@ -140,16 +154,22 @@ class MCPChatUI(tk.Tk):
     def toggle_step_panel(self):
         if not self.step_panel_visible:
             self.step_panel_visible = True
-            self.step_panel.place(x=180, y=0, relheight=1, width=400)
+            self.step_panel.pack(side=tk.LEFT, fill=tk.Y, padx=0, pady=0)
+            self.main_area.pack_forget()
+            self.main_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             self.update_step_panel()
         else:
-            self.step_panel.place_forget()
+            self.step_panel.pack_forget()
+            self.main_area.pack_forget()
+            self.main_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
             self.step_panel_visible = False
 
     def update_step_panel(self):
         for w in self.step_panel_widgets:
             w.destroy()
         self.step_panel_widgets.clear()
+
+        # 步驟一到步驟五
         for i, step in enumerate(self.step_names[:-1]):
             frame = tk.LabelFrame(
                 self.step_panel,
@@ -158,35 +178,62 @@ class MCPChatUI(tk.Tk):
                 bg="#fafdff", fg="#1e2835", relief="ridge", bd=2
             )
             frame.pack(fill=tk.X, padx=13, pady=(6,2))
-            box = tk.Text(frame, font=("Consolas", 11), bg="#fff", height=3, wrap=tk.WORD)
-            box.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+            box = tk.Text(frame, font=("Consolas", 11), bg="#fff", height=4, wrap=tk.WORD)
+            box_scroll = tk.Scrollbar(frame, command=box.yview)
+            box.configure(yscrollcommand=box_scroll.set)
+            box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=4, pady=4)
+            box_scroll.pack(side=tk.RIGHT, fill=tk.Y)
             box.insert(tk.END, self.step_outputs[i] if self.step_outputs[i] else "(無內容)")
-            box.config(state=tk.DISABLED, height=4)
+            box.config(state=tk.DISABLED)
+            box.bind("<MouseWheel>", lambda e, box=box: self._step_panel_on_mousewheel(e, box))
+            box.bind("<Button-4>", lambda e, box=box: self._step_panel_on_mousewheel(e, box))
+            box.bind("<Button-5>", lambda e, box=box: self._step_panel_on_mousewheel(e, box))
             self.step_panel_widgets.append(frame)
+        
+        # 摘要/工具結果區
         frame = tk.LabelFrame(self.step_panel, text="摘要/工具結果", font=("Microsoft JhengHei", 11, "bold"),
-                              bg="#fafdff", fg="#1e2835", relief="ridge", bd=2)
+                            bg="#fafdff", fg="#1e2835", relief="ridge", bd=2)
         frame.pack(fill=tk.BOTH, expand=True, padx=13, pady=(6,8))
         box = tk.Text(frame, font=("Consolas", 11), bg="#fff", height=8, wrap=tk.WORD)
-        box.pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
+        box_scroll = tk.Scrollbar(frame, command=box.yview)
+        box.configure(yscrollcommand=box_scroll.set)
+        box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=4, pady=4)
+        box_scroll.pack(side=tk.RIGHT, fill=tk.Y)
         box.insert(tk.END, self.summary_text if self.summary_text else "(無內容)")
         box.config(state=tk.DISABLED)
+        box.bind("<MouseWheel>", lambda e, box=box: self._step_panel_on_mousewheel(e, box))
+        box.bind("<Button-4>", lambda e, box=box: self._step_panel_on_mousewheel(e, box))
+        box.bind("<Button-5>", lambda e, box=box: self._step_panel_on_mousewheel(e, box))
+        self.step_panel_widgets.append(frame)
 
     # ========== 聊天功能 ==========
     def add_bubble(self, text, sender="assistant"):
         bubble_row = tk.Frame(self.bubble_frame, bg="#fafdff")
         bubble_row.pack(anchor="e" if sender=="user" else "w", pady=7, padx=6, fill=tk.NONE)
-        # bubble_row.pack_propagate(False)  # 讓內容自動撐開
+        
         bubble = BubbleCanvas(bubble_row, text, sender=sender)
         bubble.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        
+        # *** 新增的修正程式碼 ***
+        # 將滾輪事件從氣泡和其容器，全部轉發給主畫布的滾動函式
+        bubble.bind("<MouseWheel>", self._on_mousewheel)
+        bubble.bind("<Button-4>", self._on_mousewheel)
+        bubble.bind("<Button-5>", self._on_mousewheel)
+        
+        bubble_row.bind("<MouseWheel>", self._on_mousewheel)
+        bubble_row.bind("<Button-4>", self._on_mousewheel)
+        bubble_row.bind("<Button-5>", self._on_mousewheel)
+
         if sender == "assistant":
             icon = CopyIcon(bubble_row)
             icon.pack(side=tk.LEFT, anchor="sw", pady=(6,4), padx=(8,0))
             icon.bind("<Button-1>", lambda e, t=text: self.copy_to_clipboard(t))
             icon.bind("<Enter>", lambda e: self._set_tooltip_widget(icon) or self.show_tooltip(icon, "複製"))
             icon.bind("<Leave>", lambda e: self.hide_tooltip())
-        self.update_idletasks()
-        self.chat_canvas.yview_moveto(1.0)
 
+        self.update_idletasks()
+        self.chat_canvas.configure(scrollregion=self.chat_canvas.bbox("all"))
+        self.chat_canvas.yview_moveto(1.0)
 
     def _set_tooltip_widget(self, widget):
         self._current_tooltip_widget = widget
@@ -196,11 +243,9 @@ class MCPChatUI(tk.Tk):
         self.clipboard_clear()
         self.clipboard_append(text)
         self.update()
-        # 顯示提示
         if hasattr(self, "_current_tooltip_widget") and self._current_tooltip_widget:
             self.show_tooltip(self._current_tooltip_widget, "複製成功！", temp=800)
 
-    # --- tooltip小工具（內嵌氣泡下方）---
     def show_tooltip(self, widget, text, temp=None):
         self.hide_tooltip()
         x = widget.winfo_rootx() - widget.master.winfo_rootx()
@@ -219,23 +264,34 @@ class MCPChatUI(tk.Tk):
             self._tooltip = None
         self._current_tooltip_widget = None
 
-    # ========== 步驟進度/內容 ==========
-    def set_step(self, idx, step_output=None):
+     # ========== 步驟進度/內容 ==========
+    def update_step_lights(self):
+        """
+        根據 self.current_step_index 的值來更新所有步驟燈的顏色。
+        這是一個輪詢函式，會週期性地自我呼叫。
+        此版本使用單一互斥的邏輯塊，避免顏色覆蓋問題。
+        """
+        idx = self.current_step_index
+        
+        # 使用單一的 for 迴圈和互斥的 if/elif/else 結構
         for i, lbl in enumerate(self.step_labels):
-            if i < idx:
-                lbl.config(text=f"✅ {self.step_names[i]}", fg="#2ecc71")
-            elif i == idx:
-                if i == len(self.step_names) - 1:
-                    lbl.config(text=f"✅ {self.step_names[i]}", fg="#2ecc71")
-                else:
-                    lbl.config(text=f"🟡 {self.step_names[i]}", fg="#f39c12")
-            else:
-                lbl.config(text=f"🟢 {self.step_names[i]}", fg="#185abd")
-        if step_output is not None and idx < len(self.step_outputs):
-            self.step_outputs[idx] = step_output
-        if self.step_panel_visible:
-            self.update_step_panel()
+            
+            # 條件1: 全部步驟已完成 (最優先判斷)
+            # 條件2: 當前迴圈的步驟已完成
+            # *** 修改點：將 fg 從深藍色 '#185abd' 改為深綠色 '#006400' ***
+            if idx >= len(self.step_names) or i < idx:
+                lbl.config(text=f"🟢 {self.step_names[i]}", bg="#f5f6fa", fg="#04A904")
 
+            # 條件3: 當前迴圈的步驟正在進行中
+            elif i == idx:
+                lbl.config(text=f"🔵 {self.step_names[i]}", bg="#f5f6fa", fg="#4f8cff")
+                
+            # 條件4: 當前迴圈的步驟尚未開始
+            else:
+                lbl.config(text=f"⚪ {self.step_names[i]}", bg="#f5f6fa", fg="#b0b0b0")
+
+        # 設定 100 毫秒後再次執行本函式
+        self.after(100, self.update_step_lights)
 
     def update_summary(self, summary):
         self.summary_text = summary
@@ -249,75 +305,109 @@ class MCPChatUI(tk.Tk):
             return
         self.add_bubble(user_q, sender="user")
         self.input_box.delete(0, tk.END)
+        
+        # 在啟動執行緒前，重設步驟索引
+        self.current_step_index = -1 
+        
         threading.Thread(target=self.run_flow, args=(user_q,), daemon=True).start()
 
     def run_flow(self, user_q):
-        step_outputs, reply, summary_section = llm_agent.run_agent(
-            user_q, session_history=self.session_history, return_summary=True)
-        # print("DEBUG-step_outputs:", step_outputs)
-        # print("DEBUG-reply:", reply)
-        # print("DEBUG-summary:", summary_section)
-        for idx, step_output in enumerate(step_outputs):
-            self.set_step(idx, step_output)
-            self.update_idletasks()
-            time.sleep(0.3)
-        self.set_step(5)
-        self.set_step(5, "LLM回覆完成")
-        for idx in range(len(self.step_labels)):
-            self.set_step(idx, self.step_outputs[idx] if idx < len(self.step_outputs) else "")
-        self.update_summary(summary_section)
-        llm_reply_cleaned = clean_llm_reply(reply)
-        # ====== 一定要用 after ======
-        self.after(0, lambda: self.add_bubble(llm_reply_cleaned, sender="assistant"))
+        try:
+            # 重設步驟索引為 0 (第一個步驟開始)
+            self.current_step_index = 0
+
+            final_step_outputs = [""] * 6
+            final_reply = ""
+            final_summary_section = ""
+
+            agent = llm_agent.run_agent_smart(user_q, session_history=self.session_history, return_summary=True)
+            
+            for result in agent:
+                if isinstance(result[0], int):
+                    idx, content = result
+                    
+                    # 更新狀態變數，UI 輪詢會自動偵測到這個變化
+                    self.step_outputs[idx] = content
+                    self.current_step_index = idx 
+                        
+                    time.sleep(0.07) 
+                elif result[0] == "done":
+                    final_step_outputs, final_reply, final_summary_section = result[1]
+            
+            self.step_outputs = final_step_outputs
+            self.summary_text = final_summary_section
+            
+            llm_reply_cleaned = self._append_hint_if_needed(clean_llm_reply(final_reply))
+            self.after(0, lambda: self.add_bubble(llm_reply_cleaned, sender="assistant"))
+            self.after(0, self.update_summary, self.summary_text)
+
+            if self.step_panel_visible:
+                 self.after(0, self.update_step_panel)
+
+        except Exception as e:
+            error_message = f"執行時發生錯誤：\n{e}"
+            self.after(0, lambda: self.add_bubble(error_message, sender="assistant"))
+            self.step_outputs[-1] = error_message
+            if self.step_panel_visible:
+                self.after(0, self.update_step_panel)
+        finally:
+            # 任務結束，將步驟索引設為「全部完成」，輪詢會自動更新UI
+            self.current_step_index = len(self.step_names)
+
+    def _append_hint_if_needed(self, text):
+        return text.rstrip()
 
     def _on_mousewheel(self, event):
-        # 支援 Windows/macOS/Linux
-        if event.num == 4:  # Linux 上滾
+        if event.num == 4:
             self.chat_canvas.yview_scroll(-1, "units")
-        elif event.num == 5:  # Linux 下滾
+        elif event.num == 5:
             self.chat_canvas.yview_scroll(1, "units")
         elif hasattr(event, 'delta'):
-            if event.state & 0x1:  # Shift 鍵，橫向捲動
+            if event.state & 0x1:
                 self.chat_canvas.xview_scroll(int(-1*(event.delta/120)), "units")
             else:
                 self.chat_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
 
+    def _step_panel_on_mousewheel(self, event, box):
+        if event.num == 4:
+            box.yview_scroll(-1, "units")
+        elif event.num == 5:
+            box.yview_scroll(1, "units")
+        elif hasattr(event, 'delta'):
+            box.yview_scroll(int(-1*(event.delta/120)), "units")
+
     def clear_history(self):
-        # 清空聊天氣泡
         for widget in self.bubble_frame.winfo_children():
             widget.destroy()
-        # 步驟燈全部復歸
-        for i, lbl in enumerate(self.step_labels):
-            lbl.config(text=f"🟢 {self.step_names[i]}", fg="#185abd")
-        # 步驟內容與摘要清空
+            
+        # 重設狀態變數，輪詢函式會自動更新UI
+        self.current_step_index = -1
+        
         self.step_outputs = [""] * len(self.step_outputs)
         self.summary_text = ""
         self.session_history = []
         self.summary_records = []
-        # 側欄刷新
+        
         if self.step_panel_visible:
             self.update_step_panel()
-        # 聊天區補初始提示
+            
         self.add_bubble("請在下方輸入您的查詢需求。", sender="assistant")
 
 def clean_llm_reply(text):
     import re
-    # 移除開頭的 #、*、-、多餘分隔線
     text = re.sub(r'^[#\*\- ]+', '', text, flags=re.MULTILINE)
     text = re.sub(r'[\*\-]+', '', text)
-    # 合理保留清單符號
     lines = [line.rstrip() for line in text.split('\n')]
     cleaned = []
     for line in lines:
-        if re.match(r'^\d+[\.、]', line):  # 數字條列
+        if re.match(r'^\d+[\.、]', line):
             cleaned.append(line)
-        elif line.strip().startswith('- '):  # - 條列
+        elif line.strip().startswith('- '):
             cleaned.append(line)
         elif line.strip() == '':
             cleaned.append('')
         else:
             cleaned.append(line)
-    # 只用一個空行分段
     return '\n'.join(cleaned)
 
 if __name__ == "__main__":
