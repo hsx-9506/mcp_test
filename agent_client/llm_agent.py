@@ -297,8 +297,6 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
         step_outputs[4] = "(跳過)"
         yield 4, step_outputs[4]
 
-        # 直接基於歷史紀錄進行對話
-        # 注意：history 已經包含了最新的 user_query
         messages_for_followup = [
             {"role": "system", "content": SYSTEM_PROMPT},
             *history 
