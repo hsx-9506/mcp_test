@@ -2,7 +2,7 @@ import json
 from fastapi import FastAPI, Query
 from typing import List, Optional
 from fastapi.responses import JSONResponse
-from collections import defaultdict
+from collections import defaultdict, Counter # 引入 Counter
 from config.setting import MOCK_DATA_PATH, CPK_PPK_THRESHOLD
 
 app = FastAPI(title="Summary Server",
@@ -22,14 +22,16 @@ TYPE_FIELDS = {
     'production_summary': ['batch_id', 'machine_id', 'line', 'shift', 'target_qty', 'actual_qty', 'achieve_rate'],
     'downtime_summary': ['batch_id', 'machine_id', 'line', 'shift', 'event_count', 'total_minutes', 'main_reason', 'remark'],
     'yield_summary': ['batch_id', 'product', 'line', 'shift', 'good_qty', 'ng_qty', 'yield_percent'],
-    'anomaly_trend': ['batch_id', 'date', 'machine_id', 'line', 'event_type', 'abnormal_code', 'count', 'anomaly_remark'],
+    # 趨勢分析著重於原因、地點、時間等聚合資訊
+    'anomaly_trend': ['date', 'machine_id', 'line', 'event_type', 'main_reason', 'anomaly_remark', 'count'],
     'KPI_summary': ['batch_id', 'kpi_name', 'value', 'target', 'kpi_achieve_rate'],
     'issue_tracker': ['batch_id', 'issue_id', 'status', 'owner', 'created_at', 'closed_at', 'description'],
-    # 新增最關鍵欄位 ↓↓↓
+    # 批次異常維持原樣，提供最完整的單一批次資訊
     'batch_anomaly': [
         'batch_id', 'product', 'machine_id', 'date', 'abnormal_count', 'abnormal_features',
         'main_reason', 'anomaly_remark', 'spc_items', 'ng_qty', 'good_qty'
     ],
+    # SPC查詢專注於回傳包含製程能力指標的項目
     'spc_summary': [
         'batch_id', 'product', 'machine_id', 'date', 'spc_items'
     ]
@@ -81,38 +83,54 @@ def query_server(
 ):
     if type not in SUPPORTED_TYPES:
         return {"status": "error", "msg": f"不支援的查詢型別: {type}"}
+    
     # 動態欄位
+    use_fields = TYPE_FIELDS.get(type, [])
     if fields:
         use_fields = [f.strip() for f in fields.split(',') if f.strip()]
-    else:
-        use_fields = TYPE_FIELDS.get(type, [])
+    
+    if type == 'anomaly_trend':
+        trend_data = []
+        # 從原始數據中提取所有與趨勢相關的事件紀錄
+        for row in DATA:
+            # 我們認為，只要 'anomaly_remark' 存在，就代表一筆值得分析的歷史事件
+            if row.get('anomaly_remark'):
+                trend_item = {k: row.get(k) for k in use_fields if k in row}
+                # 確保 'count' 欄位存在，若無則預設為 1
+                if 'count' not in trend_item or not trend_item['count']:
+                    trend_item['count'] = 1
+                trend_data.append(trend_item)
+        
+        return JSONResponse({
+            "status": "ok",
+            "type": "anomaly_trend",
+            "total": len(trend_data),
+            "data": trend_data
+        })
+
     # 過濾
     result = []
     for row in DATA:
-        if batch_id and row.get('batch_id') != batch_id:
-            continue
-        if machine_id and row.get('machine_id') != machine_id:
-            continue
-        if product and row.get('product') != product:
-            continue
-        if shift and row.get('shift') != shift:
-            continue
-        if date and row.get('date') != date:
-            continue
-        if status and row.get('status') != status:
-            continue
-        if abnormal_only and not is_abnormal(row):
-            continue
+        if batch_id and row.get('batch_id') != batch_id: continue
+        if machine_id and row.get('machine_id') != machine_id: continue
+        if product and row.get('product') != product: continue
+        if shift and row.get('shift') != shift: continue
+        if date and row.get('date') != date: continue
+        if status and row.get('status') != status: continue
+        if abnormal_only and not is_abnormal(row): continue
+        if batch_abnormal_only and not is_batch_abnormal(row): continue
+
+        # spc_abnormal_only 是一個通用的篩選器
         if spc_abnormal_only and not is_spc_abnormal(row):
             continue
-        if batch_abnormal_only and not is_batch_abnormal(row):
+        
+        # 而當查詢類型本身就是 spc_summary 時，我們強制只回傳有SPC異常的批次
+        if type == 'spc_summary' and not is_spc_abnormal(row):
             continue
+
         filtered = {k: row.get(k, None) for k in use_fields}
-        # 標示異常
-        filtered['is_abnormal'] = is_abnormal(row)
-        filtered['is_spc_abnormal'] = is_spc_abnormal(row)
-        filtered['is_batch_abnormal'] = is_batch_abnormal(row)
         result.append(filtered)
+    
     # 分群/分組
     if group_by and group_by in use_fields:
         group_dict = defaultdict(list)
@@ -134,19 +152,13 @@ def query_server(
     start = (page-1)*size
     end = start+size
     paged = result[start:end]
-    # 統計
-    abnormal_count = sum(1 for r in result if r['is_abnormal'])
-    spc_abnormal_count = sum(1 for r in result if r['is_spc_abnormal'])
-    batch_abnormal_count = sum(1 for r in result if r['is_batch_abnormal'])
+
     return JSONResponse({
         "status": "ok",
         "type": type,
         "total": total,
         "page": page,
         "size": size,
-        "abnormal_count": abnormal_count,
-        "spc_abnormal_count": spc_abnormal_count,
-        "batch_abnormal_count": batch_abnormal_count,
         "data": paged
     })
 

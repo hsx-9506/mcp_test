@@ -18,8 +18,13 @@ if os.path.exists(SETTINGS_PATH):
 else:
     _settings = {}
 
-OPENAI_API_KEY = _settings["OPENAI_API_KEY"]
-JSON_CACHE = _settings["JSON_CACHE"]
-MOCK_DATA_PATH = _settings["MOCK_DATA_PATH"]
-CPK_PPK_THRESHOLD = _settings["CPK_PPK_THRESHOLD"]
-UNIFIED_SERVER_URL = _settings["UNIFIED_SERVER_URL"]
+# 從 _settings 中讀取所有設定值
+OPENAI_API_KEY = _settings.get("OPENAI_API_KEY")
+JSON_CACHE = _settings.get("JSON_CACHE")
+MOCK_DATA_PATH = _settings.get("MOCK_DATA_PATH")
+CPK_PPK_THRESHOLD = _settings.get("CPK_PPK_THRESHOLD")
+UNIFIED_SERVER_URL = _settings.get("UNIFIED_SERVER_URL")
+
+# ===== 新增的程式碼 =====
+# 讀取 USE_MOCK_DATA 開關，如果 json 檔中沒有這個鍵，預設為 True (使用假資料)
+USE_MOCK_DATA = _settings.get("USE_MOCK_DATA", True)
