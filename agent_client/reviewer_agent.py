@@ -1,5 +1,6 @@
 import openai
 import os
+from typing import Set # 引入 Set 型別提示
 
 from config.setting import OPENAI_API_KEY
 
@@ -80,3 +81,34 @@ def review_answer(user_question, mcp_tool_results, llm_reply) -> dict:
             "answer_ok": "True" in review,
             "missing": review
         }
+
+# === 【主要修改區域】: 新增一個專門用來生成追問建議的函式 ===
+def generate_suggestion(tools_used: Set[str], user_query: str) -> str:
+    """
+    根據本次對話使用的工具和使用者問題，程式化地生成最適合的追問建議。
+
+    Args:
+        tools_used: 一個包含本次呼叫所有工具名稱的集合 (set)。
+        user_query: 使用者的原始問題字串。
+
+    Returns:
+        一個包含換行符的追問建議字串，或空字串。
+    """
+    
+    # 判斷是否是改善建議的查詢
+    is_suggestion_query = any(keyword in user_query for keyword in ["建議", "怎麼辦", "如何改善"])
+    
+    # 規則1：如果使用者問的是改善建議，推薦其他功能
+    if is_suggestion_query:
+        return "\n\n您也可以查詢今日產能或良率狀況。"
+        
+    # 規則2：如果查詢了異常趨勢
+    if 'anomaly_trend' in tools_used:
+        return "\n\n如需查詢特定批次的詳細異常，請提供批次號。"
+        
+    # 規則3：如果查詢了即時異常（批次或SPC）
+    if 'batch_anomaly' in tools_used or 'spc_summary' in tools_used:
+        return "\n\n如需查詢異常趨勢或改善建議，請直接提問。"
+        
+    # 規則4：其他所有情況，不提供追問
+    return ""
