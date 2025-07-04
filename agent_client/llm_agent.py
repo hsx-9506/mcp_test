@@ -288,18 +288,8 @@ def run_agent_smart(user_query, session_history=None, return_summary=False, max_
         yield 3, step_outputs[3]
         step_outputs[4] = "(跳過)"
         yield 4, step_outputs[4]
-<<<<<<< HEAD
-
-        messages_for_followup = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            *history 
-        ]
-        
-=======
         messages_for_followup = [{"role": "system", "content": SYSTEM_PROMPT}, *history]
->>>>>>> prompt-調整
         llm_reply = call_llm(messages_for_followup)
-        # 【修改點 2】: 這裡也呼叫 reviewer_agent 來生成建議
         final_suggestion = generate_suggestion(tools_used=set(), user_query=user_query)
         final_response = llm_reply + final_suggestion
         step_outputs[5] = final_response
