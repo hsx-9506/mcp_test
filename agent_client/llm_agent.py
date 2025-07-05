@@ -1,7 +1,6 @@
 import os, re, json, requests, time, argparse
 from openai import OpenAI
 from pathlib import Path
-from dotenv import load_dotenv
 from typing import Dict
 from collections import Counter
 from agent_client.reviewer_agent import review_answer
@@ -13,11 +12,9 @@ from config.prompts import (
     load_intents, build_llm_intent_doc
 )
 
-load_dotenv()
 INTENTS = load_intents()
 LLM_INTENT_DOC = build_llm_intent_doc(INTENTS)
 
-load_dotenv()
 # ────────────── 語意拆解與自動 tool_call ──────────────
 def extract_json(text: str) -> str:
     """
